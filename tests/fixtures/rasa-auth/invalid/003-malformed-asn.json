@@ -1,0 +1,12 @@
+{
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": "not-a-number",
+        "authorized_in": [
+          {"entry": {"asset": "AS-TEST"}}
+        ]
+      }
+    }
+  ]
+}

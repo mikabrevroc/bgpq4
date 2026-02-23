@@ -1,0 +1,10 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-EMPTY",
+        "members": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-PARENT",
+        "members": [64496],
+        "nested_sets": ["AS-CHILD1", "AS-CHILD2"]
+      }
+    }
+  ]
+}

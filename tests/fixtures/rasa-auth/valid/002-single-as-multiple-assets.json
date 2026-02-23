@@ -1,0 +1,14 @@
+{
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {"entry": {"asset": "AS-TEST1"}},
+          {"entry": {"asset": "AS-TEST2"}},
+          {"entry": {"asset": "AS-TEST3"}}
+        ]
+      }
+    }
+  ]
+}

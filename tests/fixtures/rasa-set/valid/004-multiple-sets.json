@@ -1,0 +1,22 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-SET1",
+        "members": [64496, 64497]
+      }
+    },
+    {
+      "rasa_set": {
+        "as_set_name": "AS-SET2",
+        "members": [64498, 64499]
+      }
+    },
+    {
+      "rasa_set": {
+        "as_set_name": "AS-SET3",
+        "members": [64500, 64501]
+      }
+    }
+  ]
+}

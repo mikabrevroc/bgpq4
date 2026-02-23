@@ -1,0 +1,11 @@
+{
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_in": [
+          {"entry": {"asset": "AS-TEST"}}
+        ]
+      }
+    }
+  ]
+}

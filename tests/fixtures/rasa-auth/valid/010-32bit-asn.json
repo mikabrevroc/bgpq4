@@ -1,0 +1,12 @@
+{
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 4294967295,
+        "authorized_in": [
+          {"entry": {"asset": "AS-MAX"}}
+        ]
+      }
+    }
+  ]
+}

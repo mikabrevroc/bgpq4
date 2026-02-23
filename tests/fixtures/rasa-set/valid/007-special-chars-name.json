@@ -1,0 +1,16 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS2914:AS-GLOBAL",
+        "members": [64496, 64497]
+      }
+    },
+    {
+      "rasa_set": {
+        "as_set_name": "AS-LEVEL3-TRANSIT",
+        "members": [64498]
+      }
+    }
+  ]
+}
