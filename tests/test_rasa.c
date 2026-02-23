@@ -61,14 +61,19 @@ static int tests_failed = 0;
 static char*
 create_temp_json(const char *content)
 {
-    static char path[] = "/tmp/rasa_test_XXXXXX";
+    char *path = strdup("/tmp/rasa_test_XXXXXX");
+    if (!path) return NULL;
+    
     int fd = mkstemp(path);
-    if (fd < 0) return NULL;
+    if (fd < 0) {
+        free(path);
+        return NULL;
+    }
     
     write(fd, content, strlen(content));
     close(fd);
     
-    return strdup(path);
+    return path;
 }
 
 /* Helper: Cleanup temp file */
@@ -153,8 +158,8 @@ TEST(check_auth_unauthorized_asn)
     
     int rc = rasa_check_auth(64497, "AS-EXAMPLE", &result);
     ASSERT_EQ(rc, 0);
-    /* Should allow by default since no RASA for AS64497 */
-    ASSERT_EQ(result.authorized, 1);
+    /* Should deny since AS64497 has no RASA entry */
+    ASSERT_EQ(result.authorized, 0);
     
     rasa_free_config(&cfg);
     cleanup_temp_json(path);
@@ -379,10 +384,10 @@ TEST(load_multiple_files)
     /* Load second file - should replace first */
     rasa_load_config(&cfg, path2);
     
-    /* Old AS should not be authorized anymore */
+    /* Old AS should not be authorized anymore (not in new config) */
     int rc = rasa_check_auth(64496, "AS-OLD", &result);
     ASSERT_EQ(rc, 0);
-    ASSERT_EQ(result.authorized, 1); /* Default allow */
+    ASSERT_EQ(result.authorized, 0);
     
     /* New AS should be authorized */
     rc = rasa_check_auth(15169, "AS-NEW", &result);
@@ -448,6 +453,307 @@ TEST(check_auth_null_result)
     cleanup_temp_json(path);
 }
 
+/*
+ * RASA-SET Test Suite
+ * Tests for AS-SET membership declaration functionality
+ */
+
+/* Test S1: Load valid RASA-SET JSON */
+TEST(set_load_valid_json)
+{
+    struct rasa_set_config cfg = {0};
+    const char *json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-TEST\", \"members\": [64496, 64497]}}]}";
+    
+    char *path = create_temp_json(json);
+    ASSERT(path != NULL);
+    
+    int rc = rasa_set_load_config(&cfg, path);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(cfg.enabled, 1);
+    
+    rasa_set_free_config(&cfg);
+    cleanup_temp_json(path);
+}
+
+/* Test S2: Check membership for authorized AS */
+TEST(set_check_member)
+{
+    struct rasa_set_config cfg = {0};
+    struct rasa_set_membership result = {0};
+    const char *json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-EXAMPLE\", \"members\": [64496, 64497, 64498]}}]}";
+    
+    char *path = create_temp_json(json);
+    rasa_set_load_config(&cfg, path);
+    
+    int rc = rasa_check_set_membership("AS-EXAMPLE", 64496, &result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(result.is_member, 1);
+    ASSERT(result.reason != NULL);
+    
+    rasa_set_free_config(&cfg);
+    cleanup_temp_json(path);
+}
+
+/* Test S3: Check membership for non-member AS */
+TEST(set_check_non_member)
+{
+    struct rasa_set_config cfg = {0};
+    struct rasa_set_membership result = {0};
+    const char *json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-EXAMPLE\", \"members\": [64496]}}]}";
+    
+    char *path = create_temp_json(json);
+    rasa_set_load_config(&cfg, path);
+    
+    int rc = rasa_check_set_membership("AS-EXAMPLE", 99999, &result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(result.is_member, 0);
+    
+    rasa_set_free_config(&cfg);
+    cleanup_temp_json(path);
+}
+
+/* Test S4: Check membership without RASA-SET config */
+TEST(set_check_no_config)
+{
+    struct rasa_set_membership result = {0};
+    
+    int rc = rasa_check_set_membership("AS-TEST", 64496, &result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(result.is_member, 1);
+    ASSERT(result.reason != NULL);
+}
+
+/* Test S5: Check membership for unknown AS-SET */
+TEST(set_check_unknown_asset)
+{
+    struct rasa_set_config cfg = {0};
+    struct rasa_set_membership result = {0};
+    const char *json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-EXISTS\", \"members\": [64496]}}]}";
+    
+    char *path = create_temp_json(json);
+    rasa_set_load_config(&cfg, path);
+    
+    int rc = rasa_check_set_membership("AS-UNKNOWN", 64496, &result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(result.is_member, 1);
+    ASSERT(result.reason != NULL);
+    
+    rasa_set_free_config(&cfg);
+    cleanup_temp_json(path);
+}
+
+/* Test S6: Load multiple RASA-SETs */
+TEST(set_load_multiple)
+{
+    struct rasa_set_config cfg = {0};
+    struct rasa_set_membership result = {0};
+    const char *json = "{\"rasa_sets\": ["
+        "{\"rasa_set\": {\"as_set_name\": \"AS-SET1\", \"members\": [64496]}},"
+        "{\"rasa_set\": {\"as_set_name\": \"AS-SET2\", \"members\": [64497]}}"
+        "]}";
+    
+    char *path = create_temp_json(json);
+    rasa_set_load_config(&cfg, path);
+    
+    int rc1 = rasa_check_set_membership("AS-SET1", 64496, &result);
+    ASSERT_EQ(rc1, 0);
+    ASSERT_EQ(result.is_member, 1);
+    
+    int rc2 = rasa_check_set_membership("AS-SET2", 64497, &result);
+    ASSERT_EQ(rc2, 0);
+    ASSERT_EQ(result.is_member, 1);
+    
+    rasa_set_free_config(&cfg);
+    cleanup_temp_json(path);
+}
+
+/* Test S7: RASA-SET with empty members */
+TEST(set_empty_members)
+{
+    struct rasa_set_config cfg = {0};
+    struct rasa_set_membership result = {0};
+    const char *json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-EMPTY\", \"members\": []}}]}";
+    
+    char *path = create_temp_json(json);
+    rasa_set_load_config(&cfg, path);
+    
+    int rc = rasa_check_set_membership("AS-EMPTY", 64496, &result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(result.is_member, 0);
+    
+    rasa_set_free_config(&cfg);
+    cleanup_temp_json(path);
+}
+
+/* Test S8: Free NULL RASA-SET config */
+TEST(set_free_null)
+{
+    struct rasa_set_config cfg = {0};
+    rasa_set_free_config(&cfg);
+    ASSERT_EQ(cfg.enabled, 0);
+}
+
+/* Test S9: RASA-SET with containing_as */
+TEST(set_with_containing_as)
+{
+    struct rasa_set_config cfg = {0};
+    const char *json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-TEST\", \"containing_as\": 64496, \"members\": [64497]}}]}";
+    
+    char *path = create_temp_json(json);
+    int rc = rasa_set_load_config(&cfg, path);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(cfg.enabled, 1);
+    
+    rasa_set_free_config(&cfg);
+    cleanup_temp_json(path);
+}
+
+/* Test S10: RASA-SET with nested sets */
+TEST(set_with_nested_sets)
+{
+    struct rasa_set_config cfg = {0};
+    struct rasa_set_membership result = {0};
+    const char *json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-PARENT\", \"members\": [64496], \"nested_sets\": [\"AS-CHILD\"]}}]}";
+    
+    char *path = create_temp_json(json);
+    rasa_set_load_config(&cfg, path);
+    
+    int rc = rasa_check_set_membership("AS-PARENT", 64496, &result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(result.is_member, 1);
+    
+    rasa_set_free_config(&cfg);
+    cleanup_temp_json(path);
+}
+
+/*
+ * Bidirectional Verification Tests
+ */
+
+/* Test B1: AS authorized by both RASA-AUTH and RASA-SET */
+TEST(bidir_both_authorize)
+{
+    struct rasa_config auth_cfg = {0};
+    struct rasa_set_config set_cfg = {0};
+    struct rasa_auth auth_result = {0};
+    struct rasa_set_membership set_result = {0};
+    
+    const char *auth_json = "{\"rasas\": [{\"rasa\": {\"authorized_as\": 64496, \"authorized_in\": [{\"entry\": {\"asset\": \"AS-TEST\"}}]}}]}";
+    const char *set_json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-TEST\", \"members\": [64496]}}]}";
+    
+    char *auth_path = create_temp_json(auth_json);
+    char *set_path = create_temp_json(set_json);
+    
+    rasa_load_config(&auth_cfg, auth_path);
+    rasa_set_load_config(&set_cfg, set_path);
+    
+    int rc = rasa_verify_bidirectional("AS-TEST", 64496, &auth_result, &set_result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(auth_result.authorized, 1);
+    ASSERT_EQ(set_result.is_member, 1);
+    
+    rasa_free_config(&auth_cfg);
+    rasa_set_free_config(&set_cfg);
+    cleanup_temp_json(auth_path);
+    cleanup_temp_json(set_path);
+}
+
+/* Test B2: AS authorized only by RASA-AUTH */
+TEST(bidir_auth_only)
+{
+    struct rasa_config auth_cfg = {0};
+    struct rasa_set_config set_cfg = {0};
+    struct rasa_auth auth_result = {0};
+    struct rasa_set_membership set_result = {0};
+    
+    const char *auth_json = "{\"rasas\": [{\"rasa\": {\"authorized_as\": 64496, \"authorized_in\": [{\"entry\": {\"asset\": \"AS-TEST\"}}]}}]}";
+    const char *set_json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-TEST\", \"members\": [99999]}}]}";
+    
+    char *auth_path = create_temp_json(auth_json);
+    char *set_path = create_temp_json(set_json);
+    
+    rasa_load_config(&auth_cfg, auth_path);
+    rasa_set_load_config(&set_cfg, set_path);
+    
+    int rc = rasa_verify_bidirectional("AS-TEST", 64496, &auth_result, &set_result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(auth_result.authorized, 1);
+    ASSERT_EQ(set_result.is_member, 0);
+    
+    rasa_free_config(&auth_cfg);
+    rasa_set_free_config(&set_cfg);
+    cleanup_temp_json(auth_path);
+    cleanup_temp_json(set_path);
+}
+
+/* Test B3: AS authorized only by RASA-SET */
+TEST(bidir_set_only)
+{
+    struct rasa_config auth_cfg = {0};
+    struct rasa_set_config set_cfg = {0};
+    struct rasa_auth auth_result = {0};
+    struct rasa_set_membership set_result = {0};
+    
+    const char *auth_json = "{\"rasas\": [{\"rasa\": {\"authorized_as\": 99999, \"authorized_in\": [{\"entry\": {\"asset\": \"AS-TEST\"}}]}}]}";
+    const char *set_json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-TEST\", \"members\": [64496]}}]}";
+    
+    char *auth_path = create_temp_json(auth_json);
+    char *set_path = create_temp_json(set_json);
+    
+    rasa_load_config(&auth_cfg, auth_path);
+    rasa_set_load_config(&set_cfg, set_path);
+    
+    int rc = rasa_verify_bidirectional("AS-TEST", 64496, &auth_result, &set_result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(auth_result.authorized, 0);
+    ASSERT_EQ(set_result.is_member, 1);
+    
+    rasa_free_config(&auth_cfg);
+    rasa_set_free_config(&set_cfg);
+    cleanup_temp_json(auth_path);
+    cleanup_temp_json(set_path);
+}
+
+/* Test B4: AS not authorized by either */
+TEST(bidir_neither_authorize)
+{
+    struct rasa_config auth_cfg = {0};
+    struct rasa_set_config set_cfg = {0};
+    struct rasa_auth auth_result = {0};
+    struct rasa_set_membership set_result = {0};
+    
+    const char *auth_json = "{\"rasas\": [{\"rasa\": {\"authorized_as\": 99999, \"authorized_in\": [{\"entry\": {\"asset\": \"AS-OTHER\"}}]}}]}";
+    const char *set_json = "{\"rasa_sets\": [{\"rasa_set\": {\"as_set_name\": \"AS-TEST\", \"members\": [99999]}}]}";
+    
+    char *auth_path = create_temp_json(auth_json);
+    char *set_path = create_temp_json(set_json);
+    
+    rasa_load_config(&auth_cfg, auth_path);
+    rasa_set_load_config(&set_cfg, set_path);
+    
+    int rc = rasa_verify_bidirectional("AS-TEST", 64496, &auth_result, &set_result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(auth_result.authorized, 0);
+    ASSERT_EQ(set_result.is_member, 0);
+    
+    rasa_free_config(&auth_cfg);
+    rasa_set_free_config(&set_cfg);
+    cleanup_temp_json(auth_path);
+    cleanup_temp_json(set_path);
+}
+
+/* Test B5: Bidirectional with no config */
+TEST(bidir_no_config)
+{
+    struct rasa_auth auth_result = {0};
+    struct rasa_set_membership set_result = {0};
+    
+    int rc = rasa_verify_bidirectional("AS-TEST", 64496, &auth_result, &set_result);
+    ASSERT_EQ(rc, 0);
+    ASSERT_EQ(auth_result.authorized, 1);
+    ASSERT_EQ(set_result.is_member, 1);
+}
+
 /* Main test runner */
 int
 main(int argc, char **argv)
@@ -484,6 +790,39 @@ main(int argc, char **argv)
     RUN_TEST(load_empty_rasas);
     RUN_TEST(load_missing_rasas);
     RUN_TEST(check_auth_null_result);
+    
+    printf("\n");
+    printf("========================================\n");
+    printf("RASA-SET Test Suite\n");
+    printf("========================================\n");
+    printf("\n");
+    
+    printf("Running 10 RASA-SET tests:\n\n");
+    
+    RUN_TEST(set_load_valid_json);
+    RUN_TEST(set_check_member);
+    RUN_TEST(set_check_non_member);
+    RUN_TEST(set_check_no_config);
+    RUN_TEST(set_check_unknown_asset);
+    RUN_TEST(set_load_multiple);
+    RUN_TEST(set_empty_members);
+    RUN_TEST(set_free_null);
+    RUN_TEST(set_with_containing_as);
+    RUN_TEST(set_with_nested_sets);
+    
+    printf("\n");
+    printf("========================================\n");
+    printf("Bidirectional Verification Test Suite\n");
+    printf("========================================\n");
+    printf("\n");
+    
+    printf("Running 5 bidirectional tests:\n\n");
+    
+    RUN_TEST(bidir_both_authorize);
+    RUN_TEST(bidir_auth_only);
+    RUN_TEST(bidir_set_only);
+    RUN_TEST(bidir_neither_authorize);
+    RUN_TEST(bidir_no_config);
     
     printf("\n");
     printf("========================================\n");
