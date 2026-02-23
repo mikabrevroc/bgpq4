@@ -209,9 +209,13 @@ bgpq_expander_add_as(struct bgpq_expander *b, char *as)
 #ifdef HAVE_JANSSON
 	if (b->rasa && b->rasa->enabled) {
 		struct rasa_auth result;
-		if (rasa_check_auth(asno, NULL, &result) == 0 && !result.authorized) {
-			SX_DEBUG(debug_expander, "RASA: AS%u not authorized: %s\n",
-			    asno, result.reason ? result.reason : "unknown");
+		const char *asset = b->current_asset;
+		if (rasa_check_auth(asno, asset, &result) == 0 && !result.authorized) {
+			SX_DEBUG(debug_expander, "RASA: AS%u not authorized%s%s: %s\n",
+			    asno,
+			    asset ? " in " : "",
+			    asset ? asset : "",
+			    result.reason ? result.reason : "unknown");
 			free(asne);
 			return 0;
 		}
@@ -340,6 +344,7 @@ bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
 
 	if (!strncasecmp(as, "AS-", 3) || strchr(as, '-') || strchr(as, ':')) {
 		struct sx_tentry tkey = { .text = as };
+		char *prev_asset = NULL;
 
 		if (RB_FIND(tentree, &b->already, &tkey)) {
 			SX_DEBUG(debug_expander > 2, "%s is already expanding, "
@@ -357,6 +362,11 @@ bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
 		    (b->cdepth + 1 < b->maxdepth &&
 		    req->depth + 1 < b->maxdepth)) {
 			bgpq_expander_add_already(b, as);
+#ifdef HAVE_JANSSON
+			/* Save current asset context and set new one for nested expansion */
+			prev_asset = b->current_asset;
+			b->current_asset = strdup(as);
+#endif
 			if (pipelining) {
 				if (b->usesource) {
 					source = bgpq_get_source(as);
@@ -390,6 +400,11 @@ bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
 				    NULL, "!i%s\n", bgpq_get_asset(as));
 				b->cdepth--;
 			}
+#ifdef HAVE_JANSSON
+			/* Restore previous asset context */
+			free(b->current_asset);
+			b->current_asset = prev_asset;
+#endif
 		} else {
 			SX_DEBUG(debug_expander > 2, "ignoring %s at depth %i\n",
 			    as, b->cdepth ? (b->cdepth + 1) : (req->depth + 1));
@@ -1220,6 +1235,10 @@ bgpq_expand(struct bgpq_expander *b)
 		fcntl(fd, F_SETFL, O_NONBLOCK|(fcntl(fd, F_GETFL)));
 
 	STAILQ_FOREACH(mc, &b->macroses, entry) {
+#ifdef HAVE_JANSSON
+		/* Set current asset context for top-level AS-SET expansion */
+		b->current_asset = strdup(mc->text);
+#endif
 		if (!b->maxdepth && RB_EMPTY(&b->stoplist)) {
 			if (b->usesource) {
 				source = bgpq_get_source(mc->text);
@@ -1264,6 +1283,11 @@ bgpq_expand(struct bgpq_expander *b)
 				bgpq_expand_irrd(b, bgpq_expanded_macro_limit,
 				    NULL, "!i%s\n", bgpq_get_asset(mc->text));
 		}
+#ifdef HAVE_JANSSON
+		/* Clear current asset context after expansion */
+		free(b->current_asset);
+		b->current_asset = NULL;
+#endif
 	}
 
 	if (pipelining){
@@ -1468,6 +1492,11 @@ expander_freeall(struct bgpq_expander *expander)
 	}
 
 	sx_radix_tree_freeall(expander->tree);
+
+#ifdef HAVE_JANSSON
+	if (expander->current_asset)
+		free(expander->current_asset);
+#endif
 
 	bgpq_prequest_freeall(expander->firstpipe);
 	bgpq_prequest_freeall(expander->lastpipe);
