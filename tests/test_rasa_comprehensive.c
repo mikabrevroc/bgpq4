@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "../rasa.h"
+#include "rasa.h"
 
 static int tests_run = 0, tests_passed = 0, tests_failed = 0;
 

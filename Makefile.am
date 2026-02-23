@@ -14,6 +14,13 @@ bgpq4_LDADD = $(PLATFORM_LDADD) $(PROG_LDADD) $(JANSSON_LIBS)
 if !HAVE_STRLCPY
 SUBDIRS += compat
 bgpq4_LDADD += $(top_builddir)/compat/libcompat.la
+endif
+
+bgpq4_SOURCES=main.c extern.h printer.c expander.c rasa.c rasa.h \
+    sx_prefix.c sx_prefix.h \
+    sx_report.c sx_report.h \
+    sx_slentry.c
+
 check_PROGRAMS = test_rasa test_rasa_integration test_rasa_comprehensive
 test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h
 test_rasa_LDADD = $(JANSSON_LIBS)
@@ -21,13 +28,6 @@ test_rasa_integration_SOURCES = tests/test_rasa_integration.c expander.c rasa.c 
 test_rasa_integration_LDADD = $(JANSSON_LIBS) $(PLATFORM_LDADD)
 test_rasa_comprehensive_SOURCES = tests/test_rasa_comprehensive.c rasa.c rasa.h
 test_rasa_comprehensive_LDADD = $(JANSSON_LIBS)
-    sx_slentry.c
-
-check_PROGRAMS = test_rasa test_rasa_integration
-test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h
-test_rasa_LDADD = $(JANSSON_LIBS)
-test_rasa_integration_SOURCES = tests/test_rasa_integration.c expander.c rasa.c extern.h rasa.h sx_prefix.c sx_report.c sx_slentry.c
-test_rasa_integration_LDADD = $(JANSSON_LIBS) $(PLATFORM_LDADD)
 
 EXTRA_DIST=bootstrap README.md CHANGES
 
