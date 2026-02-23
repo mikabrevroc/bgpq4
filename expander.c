@@ -1494,8 +1494,10 @@ expander_freeall(struct bgpq_expander *expander)
 	sx_radix_tree_freeall(expander->tree);
 
 #ifdef HAVE_JANSSON
-	if (expander->current_asset)
+	if (expander->current_asset) {
 		free(expander->current_asset);
+		expander->current_asset = NULL;
+	}
 #endif
 
 	bgpq_prequest_freeall(expander->firstpipe);

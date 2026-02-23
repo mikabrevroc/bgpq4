@@ -42,8 +42,8 @@ rasa_check_auth(uint32_t asn, const char *asset, struct rasa_auth *result)
 	json_t *rasas, *rasa_entry, *rasa_obj, *authorized_in;
 	size_t i;
 
-	if (!rasa_data || !result) {
-		fprintf(stderr, "RASA: Check auth called with null data/result\n");
+	if (!result) {
+		fprintf(stderr, "RASA: Check auth called with null result\n");
 		return -1;
 	}
 
@@ -52,6 +52,12 @@ rasa_check_auth(uint32_t asn, const char *asset, struct rasa_auth *result)
 	result->asn = asn;
 	result->authorized = 1;
 	result->reason = NULL;
+
+	if (!rasa_data) {
+		fprintf(stderr, "RASA: No RASA data loaded, allowing by default\n");
+		result->reason = "no RASA config (default allow)";
+		return 0;
+	}
 
 	rasas = json_object_get(rasa_data, "rasas");
 	if (!rasas || !json_is_array(rasas)) {
@@ -125,9 +131,13 @@ rasa_check_auth(uint32_t asn, const char *asset, struct rasa_auth *result)
 void
 rasa_free_config(struct rasa_config *cfg)
 {
-	if (cfg->source_file)
+	if (cfg->source_file) {
 		free(cfg->source_file);
-	if (rasa_data)
+		cfg->source_file = NULL;
+	}
+	if (rasa_data) {
 		json_decref(rasa_data);
+		rasa_data = NULL;
+	}
 	cfg->enabled = 0;
 }
