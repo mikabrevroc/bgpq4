@@ -21,7 +21,6 @@ bgpq4_SOURCES=main.c extern.h printer.c expander.c rasa.c rasa.h \
     sx_report.c sx_report.h \
     sx_slentry.c
 
-
 check_PROGRAMS = test_rasa test_rasa_integration
 test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h
 test_rasa_LDADD = $(JANSSON_LIBS)
