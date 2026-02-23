@@ -104,6 +104,11 @@ usage(int ecode)
 	printf(" -W len    : specify max-entries on as-path/as-list line (use 0 for "
 		"infinity)\n");
 
+#ifdef HAVE_JANSSON
+	printf("\nRASA options:\n");
+	printf(" -Y        : enable RASA (RPKI AS-SET Authorization) checking\n");
+	printf(" -y file   : RASA authorization data file (JSON from rpki-client)\n");
+#endif
 	printf("\nUtility operations:\n");
 	printf(" -d        : generate some debugging output\n");
 	printf(" -h host   : host running IRRD software (default: rr.ntt.net)\n"
@@ -201,7 +206,7 @@ main(int argc, char* argv[])
 		expander.sources=getenv("IRRD_SOURCES");
 
 	while ((c = getopt(argc, argv,
-	    "23467a:AbBdDEeF:S:jJKf:l:L:m:M:NnpW:r:R:G:H:tTh:UuwXsvz")) != EOF) {
+    "23467a:AbBdDEeF:S:jJKf:l:L:m:M:NnpW:r:R:G:H:tTh:UuwXsvzYy:") != EOF) {
 	switch (c) {
 	case '2':
 		if (expander.vendor != V_NOKIA_MD) {
@@ -458,6 +463,32 @@ main(int argc, char* argv[])
 			exclusive();
 		expander.generation = T_ROUTE_FILTER_LIST;
 		break;
+#ifdef HAVE_JANSSON
+	case 'Y':
+		if (!expander.rasa) {
+			expander.rasa = calloc(1, sizeof(struct rasa_config));
+			if (!expander.rasa) {
+				sx_report(SX_FATAL, "Failed to allocate RASA config\n");
+				exit(1);
+			}
+		}
+		expander.rasa->enabled = 1;
+		break;
+	case 'y':
+		if (!expander.rasa) {
+			expander.rasa = calloc(1, sizeof(struct rasa_config));
+			if (!expander.rasa) {
+				sx_report(SX_FATAL, "Failed to allocate RASA config\n");
+				exit(1);
+			}
+		}
+		if (rasa_load_config(expander.rasa, optarg) != 0) {
+			sx_report(SX_FATAL, "Failed to load RASA config from %s\n",
+			    optarg);
+			exit(1);
+		}
+		break;
+#endif
 	default:
 		usage(1);
 	}

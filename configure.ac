@@ -109,6 +109,13 @@ AC_CHECK_HEADERS([sys/cdefs.h sys/queue.h sys/tree.h sys/select.h])
 AM_CONDITIONAL([HAVE_PLEDGE], [test "x$ac_cv_func_pledge" = xyes])
 AM_CONDITIONAL([HAVE_STRLCPY], [test "x$ac_cv_func_strlcpy" = xyes])
 
+# Check for jansson library (optional, for RASA support)
+PKG_CHECK_MODULES([JANSSON], [jansson],
+    [AC_DEFINE([HAVE_JANSSON], [1], [Define if jansson is available])
+     have_jansson=yes],
+    [have_jansson=no])
+AM_CONDITIONAL([HAVE_JANSSON], [test "x$have_jansson" = xyes])
+
 AC_CONFIG_FILES([
 	Makefile
 	include/Makefile
