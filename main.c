@@ -206,7 +206,7 @@ main(int argc, char* argv[])
 		expander.sources=getenv("IRRD_SOURCES");
 
 	while ((c = getopt(argc, argv,
-    "23467a:AbBdDEeF:S:jJKf:l:L:m:M:NnpW:r:R:G:H:tTh:UuwXsvzYy:") != EOF) {
+    "23467a:AbBdDEeF:S:jJKf:l:L:m:M:NnpW:r:R:G:H:tTh:UuwXsvzYy:")) != EOF) {
 	switch (c) {
 	case '2':
 		if (expander.vendor != V_NOKIA_MD) {
