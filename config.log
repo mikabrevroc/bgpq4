@@ -30,8 +30,8 @@ Kernel configured for up to 10 processors.
 Processor type: arm64e (ARM64E)
 Processors active: 0 1 2 3 4 5 6 7 8 9
 Primary memory available: 16.00 gigabytes
-Default processor set: 904 tasks, 5003 threads, 10 processors
-Load average: 6.45, Mach factor: 3.84
+Default processor set: 774 tasks, 3924 threads, 10 processors
+Load average: 3.52, Mach factor: 6.46
 /bin/machine           = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
@@ -432,7 +432,7 @@ configure:14462: checking for pledge
 configure:14462: cc -o conftest -g -O2   conftest.c  >&5
 Undefined symbols for architecture arm64:
   "_pledge", referenced from:
-      _main in conftest-22e506.o
+      _main in conftest-d7c6b9.o
 ld: symbol(s) not found for architecture arm64
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 configure:14462: $? = 1
@@ -704,6 +704,7 @@ config.status:1205: executing depfiles commands
 config.status:1282: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 config.status:1287: $? = 0
 config.status:1282: cd compat       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+make: Nothing to be done for `am--depfiles'.
 config.status:1287: $? = 0
 config.status:1205: executing libtool commands
 

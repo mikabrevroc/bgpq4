@@ -106,7 +106,7 @@ usage(int ecode)
 
 #ifdef HAVE_JANSSON
 	printf("\nRASA options:\n");
-	printf(" -Y        : enable RASA (RPKI AS-SET Authorization) checking\n");
+	printf(" -Y file   : load RASA-SETs from JSON file (rpki-client output)\n");
 	printf(" -y file   : RASA authorization data file (JSON from rpki-client)\n");
 #endif
 	printf("\nUtility operations:\n");
@@ -206,7 +206,7 @@ main(int argc, char* argv[])
 		expander.sources=getenv("IRRD_SOURCES");
 
 	while ((c = getopt(argc, argv,
-    "23467a:AbBdDEeF:S:jJKf:l:L:m:M:NnpW:r:R:G:H:tTh:UuwXsvzYy:")) != EOF) {
+    '23467a:AbBdDEeF:S:jJKf:l:L:m:M:NnpW:r:R:G:H:tTh:UuwXsvzYy:Y:')) != EOF) {
 	switch (c) {
 	case '2':
 		if (expander.vendor != V_NOKIA_MD) {
@@ -484,6 +484,13 @@ main(int argc, char* argv[])
 		}
 		if (rasa_load_config(expander.rasa, optarg) != 0) {
 			sx_report(SX_FATAL, "Failed to load RASA config from %s\n",
+			    optarg);
+			exit(1);
+		}
+		break;
+	case 'Y':
+		if (rasa_load_sets_from_json(optarg) != 0) {
+			sx_report(SX_FATAL, "Failed to load RASA-SETs from %s\n",
 			    optarg);
 			exit(1);
 		}

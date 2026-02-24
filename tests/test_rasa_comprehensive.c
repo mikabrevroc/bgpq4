@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "rasa.h"
+#include "../rasa.h"
 
 static int tests_run = 0, tests_passed = 0, tests_failed = 0;
 
@@ -88,7 +88,7 @@ clean_temp(char *path)
  * ============================================ */
 
 /* Test 1-10: Basic loading and validation */
-void test_rasa_auth_load_valid(void) {
+static void test_rasa_auth_load_valid(void) {
     struct rasa_config cfg = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496}}]}";
     char *path = make_temp(json);
@@ -99,12 +99,12 @@ void test_rasa_auth_load_valid(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_load_null_filename(void) {
+static void test_rasa_auth_load_null_filename(void) {
     struct rasa_config cfg = {0};
     ASSERT_EQ(rasa_load_config(&cfg, NULL), -1);
 }
 
-void test_rasa_auth_load_invalid_json(void) {
+static void test_rasa_auth_load_invalid_json(void) {
     struct rasa_config cfg = {0};
     const char *json = "{invalid json";
     char *path = make_temp(json);
@@ -113,7 +113,7 @@ void test_rasa_auth_load_invalid_json(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_load_empty_object(void) {
+static void test_rasa_auth_load_empty_object(void) {
     struct rasa_config cfg = {0};
     const char *json = "{}";
     char *path = make_temp(json);
@@ -124,7 +124,7 @@ void test_rasa_auth_load_empty_object(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_load_missing_rasas(void) {
+static void test_rasa_auth_load_missing_rasas(void) {
     struct rasa_config cfg = {0};
     const char *json = "{\"other_key\": \"value\"}";
     char *path = make_temp(json);
@@ -134,17 +134,17 @@ void test_rasa_auth_load_missing_rasas(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_check_null_result(void) {
+static void test_rasa_auth_check_null_result(void) {
     ASSERT_EQ(rasa_check_auth(64496, "AS-TEST", NULL), -1);
 }
 
-void test_rasa_auth_check_no_config(void) {
+static void test_rasa_auth_check_no_config(void) {
     struct rasa_auth result = {0};
     ASSERT_EQ(rasa_check_auth(64496, "AS-TEST", &result), 0);
     ASSERT_EQ(result.authorized, 1);
 }
 
-void test_rasa_auth_check_single_asn(void) {
+static void test_rasa_auth_check_single_asn(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -157,7 +157,7 @@ void test_rasa_auth_check_single_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_check_wrong_asn(void) {
+static void test_rasa_auth_check_wrong_asn(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -170,7 +170,7 @@ void test_rasa_auth_check_wrong_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_check_wrong_asset(void) {
+static void test_rasa_auth_check_wrong_asset(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -185,7 +185,7 @@ void test_rasa_auth_check_wrong_asset(void) {
 
 
 /* Test 11-20: Multiple ASNs and assets */
-void test_rasa_auth_multiple_asns(void) {
+static void test_rasa_auth_multiple_asns(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-SHARED\"}}]}},{\"rasa\":{\"authorized_as\":64497,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-SHARED\"}}]}}]}";
@@ -200,7 +200,7 @@ void test_rasa_auth_multiple_asns(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_multiple_assets_single_asn(void) {
+static void test_rasa_auth_multiple_assets_single_asn(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST1\"}},{\"entry\":{\"asset\":\"AS-TEST2\"}},{\"entry\":{\"asset\":\"AS-TEST3\"}}]}}]}";
@@ -219,7 +219,7 @@ void test_rasa_auth_multiple_assets_single_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_empty_authorized_in(void) {
+static void test_rasa_auth_empty_authorized_in(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[]}}]}";
@@ -232,7 +232,7 @@ void test_rasa_auth_empty_authorized_in(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_no_authorized_in_key(void) {
+static void test_rasa_auth_no_authorized_in_key(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496}}]}";
@@ -245,7 +245,7 @@ void test_rasa_auth_no_authorized_in_key(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_special_chars_in_asset(void) {
+static void test_rasa_auth_special_chars_in_asset(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS2914:AS-GLOBAL\"}}]}}]}";
@@ -258,7 +258,7 @@ void test_rasa_auth_special_chars_in_asset(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_32bit_asn(void) {
+static void test_rasa_auth_32bit_asn(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":4200000000,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -271,7 +271,7 @@ void test_rasa_auth_32bit_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_asn_zero(void) {
+static void test_rasa_auth_asn_zero(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":0,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -284,7 +284,7 @@ void test_rasa_auth_asn_zero(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_large_asn_16bit_max(void) {
+static void test_rasa_auth_large_asn_16bit_max(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":65535,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -297,7 +297,7 @@ void test_rasa_auth_large_asn_16bit_max(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_large_asn_16bit_plus_one(void) {
+static void test_rasa_auth_large_asn_16bit_plus_one(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":65536,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -310,7 +310,7 @@ void test_rasa_auth_large_asn_16bit_plus_one(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_duplicate_entries(void) {
+static void test_rasa_auth_duplicate_entries(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}},{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -325,7 +325,7 @@ void test_rasa_auth_duplicate_entries(void) {
 
 
 /* Test 21-30: Edge cases and error conditions */
-void test_rasa_auth_null_asset(void) {
+static void test_rasa_auth_null_asset(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -338,7 +338,7 @@ void test_rasa_auth_null_asset(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_empty_asset(void) {
+static void test_rasa_auth_empty_asset(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"\"}}]}}]}";
@@ -351,7 +351,7 @@ void test_rasa_auth_empty_asset(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_whitespace_asset(void) {
+static void test_rasa_auth_whitespace_asset(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -364,7 +364,7 @@ void test_rasa_auth_whitespace_asset(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_case_sensitive(void) {
+static void test_rasa_auth_case_sensitive(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -379,7 +379,7 @@ void test_rasa_auth_case_sensitive(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_malformed_entry(void) {
+static void test_rasa_auth_malformed_entry(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"asset\":\"AS-TEST\"}]}}]}";
@@ -392,7 +392,7 @@ void test_rasa_auth_malformed_entry(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_missing_asset_field(void) {
+static void test_rasa_auth_missing_asset_field(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"other\":\"field\"}}]}}]}";
@@ -405,7 +405,7 @@ void test_rasa_auth_missing_asset_field(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_non_integer_asn(void) {
+static void test_rasa_auth_non_integer_asn(void) {
     struct rasa_config cfg = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":\"not-an-integer\"}}]}";
     char *path = make_temp(json);
@@ -415,7 +415,7 @@ void test_rasa_auth_non_integer_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_negative_asn(void) {
+static void test_rasa_auth_negative_asn(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":-1,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -428,7 +428,7 @@ void test_rasa_auth_negative_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_reuse_config_struct(void) {
+static void test_rasa_auth_reuse_config_struct(void) {
     struct rasa_config cfg = {0};
     const char *json1 = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496}}]}";
     const char *json2 = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64497}}]}";
@@ -444,14 +444,14 @@ void test_rasa_auth_reuse_config_struct(void) {
     clean_temp(path2);
 }
 
-void test_rasa_auth_free_null_config(void) {
+static void test_rasa_auth_free_null_config(void) {
     struct rasa_config cfg = {0};
     rasa_free_config(&cfg);
 }
 
 
 /* Test 31-40: Complex scenarios */
-void test_rasa_auth_many_asns(void) {
+static void test_rasa_auth_many_asns(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     char json[4096];
@@ -476,7 +476,7 @@ void test_rasa_auth_many_asns(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_many_assets(void) {
+static void test_rasa_auth_many_assets(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     char json[8192];
@@ -501,7 +501,7 @@ void test_rasa_auth_many_assets(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_asn_not_in_any_rasa(void) {
+static void test_rasa_auth_asn_not_in_any_rasa(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -515,7 +515,7 @@ void test_rasa_auth_asn_not_in_any_rasa(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_different_assets_different_asns(void) {
+static void test_rasa_auth_different_assets_different_asns(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-A\"}}]}},{\"rasa\":{\"authorized_as\":64497,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-B\"}}]}}]}";
@@ -534,7 +534,7 @@ void test_rasa_auth_different_assets_different_asns(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_overlapping_authorizations(void) {
+static void test_rasa_auth_overlapping_authorizations(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-SHARED\"}},{\"entry\":{\"asset\":\"AS-UNIQUE1\"}}]}},{\"rasa\":{\"authorized_as\":64497,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-SHARED\"}},{\"entry\":{\"asset\":\"AS-UNIQUE2\"}}]}}]}";
@@ -553,7 +553,7 @@ void test_rasa_auth_overlapping_authorizations(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_long_asset_name(void) {
+static void test_rasa_auth_long_asset_name(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     char asset[256];
@@ -570,7 +570,7 @@ void test_rasa_auth_long_asset_name(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_extra_fields_ignored(void) {
+static void test_rasa_auth_extra_fields_ignored(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"extra_field\":\"ignored\",\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\",\"another_extra\":123}}]}}],\"other_top_level\":\"also_ignored\"}";
@@ -583,7 +583,7 @@ void test_rasa_auth_extra_fields_ignored(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_minimal_valid(void) {
+static void test_rasa_auth_minimal_valid(void) {
     struct rasa_config cfg = {0};
     const char *json = "{\"rasas\":[]}";
     char *path = make_temp(json);
@@ -593,7 +593,7 @@ void test_rasa_auth_minimal_valid(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_propagation_field(void) {
+static void test_rasa_auth_propagation_field(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"propagation\":{\"doNotInherit\":false},\"authorized_in\":[{\"entry\":{\"asset\":\"AS-TEST\"}}]}}]}";
@@ -606,7 +606,7 @@ void test_rasa_auth_propagation_field(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_nested_entry_format(void) {
+static void test_rasa_auth_nested_entry_format(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     const char *json = "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[{\"entry\":{\"asset\":\"AS-NESTED\"}}]}}]}";
@@ -624,7 +624,7 @@ void test_rasa_auth_nested_entry_format(void) {
  * RASA-SET Tests (40+ scenarios)
  * ============================================ */
 
-void test_rasa_set_load_valid(void) {
+static void test_rasa_set_load_valid(void) {
     struct rasa_set_config cfg = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496]}}]}";
     char *path = make_temp(json);
@@ -635,12 +635,12 @@ void test_rasa_set_load_valid(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_load_null_filename(void) {
+static void test_rasa_set_load_null_filename(void) {
     struct rasa_set_config cfg = {0};
     ASSERT_EQ(rasa_set_load_config(&cfg, NULL), -1);
 }
 
-void test_rasa_set_load_invalid_json(void) {
+static void test_rasa_set_load_invalid_json(void) {
     struct rasa_set_config cfg = {0};
     const char *json = "{invalid";
     char *path = make_temp(json);
@@ -649,17 +649,17 @@ void test_rasa_set_load_invalid_json(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_check_no_config(void) {
+static void test_rasa_set_check_no_config(void) {
     struct rasa_set_membership result = {0};
     ASSERT_EQ(rasa_check_set_membership("AS-TEST", 64496, &result), 0);
     ASSERT_EQ(result.is_member, 1);
 }
 
-void test_rasa_set_check_null_result(void) {
+static void test_rasa_set_check_null_result(void) {
     ASSERT_EQ(rasa_check_set_membership("AS-TEST", 64496, NULL), -1);
 }
 
-void test_rasa_set_check_single_member(void) {
+static void test_rasa_set_check_single_member(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496]}}]}";
@@ -672,7 +672,7 @@ void test_rasa_set_check_single_member(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_check_multiple_members(void) {
+static void test_rasa_set_check_multiple_members(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496,64497,64498]}}]}";
@@ -691,7 +691,7 @@ void test_rasa_set_check_multiple_members(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_check_wrong_set_name(void) {
+static void test_rasa_set_check_wrong_set_name(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496]}}]}";
@@ -704,7 +704,7 @@ void test_rasa_set_check_wrong_set_name(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_check_empty_members(void) {
+static void test_rasa_set_check_empty_members(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[]}}]}";
@@ -717,7 +717,7 @@ void test_rasa_set_check_empty_members(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_check_no_members_key(void) {
+static void test_rasa_set_check_no_members_key(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\"}}]}";
@@ -731,7 +731,7 @@ void test_rasa_set_check_no_members_key(void) {
 }
 
 
-void test_rasa_set_multiple_sets(void) {
+static void test_rasa_set_multiple_sets(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-SET1\",\"members\":[64496]}},{\"rasa_set\":{\"as_set_name\":\"AS-SET2\",\"members\":[64497]}}]}";
@@ -748,7 +748,7 @@ void test_rasa_set_multiple_sets(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_32bit_asn_member(void) {
+static void test_rasa_set_32bit_asn_member(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[4200000000]}}]}";
@@ -761,7 +761,7 @@ void test_rasa_set_32bit_asn_member(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_special_chars_name(void) {
+static void test_rasa_set_special_chars_name(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS2914:AS-GLOBAL\",\"members\":[64496]}}]}";
@@ -774,7 +774,7 @@ void test_rasa_set_special_chars_name(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_asn_zero(void) {
+static void test_rasa_set_asn_zero(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[0]}}]}";
@@ -787,7 +787,7 @@ void test_rasa_set_asn_zero(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_large_asn_16bit_max(void) {
+static void test_rasa_set_large_asn_16bit_max(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[65535]}}]}";
@@ -800,7 +800,7 @@ void test_rasa_set_large_asn_16bit_max(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_large_asn_16bit_plus_one(void) {
+static void test_rasa_set_large_asn_16bit_plus_one(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[65536]}}]}";
@@ -813,7 +813,7 @@ void test_rasa_set_large_asn_16bit_plus_one(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_duplicate_members(void) {
+static void test_rasa_set_duplicate_members(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496,64496,64496]}}]}";
@@ -826,7 +826,7 @@ void test_rasa_set_duplicate_members(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_null_set_name(void) {
+static void test_rasa_set_null_set_name(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496]}}]}";
@@ -839,7 +839,7 @@ void test_rasa_set_null_set_name(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_empty_set_name(void) {
+static void test_rasa_set_empty_set_name(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"\",\"members\":[64496]}}]}";
@@ -852,7 +852,7 @@ void test_rasa_set_empty_set_name(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_case_sensitive(void) {
+static void test_rasa_set_case_sensitive(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496]}}]}";
@@ -868,7 +868,7 @@ void test_rasa_set_case_sensitive(void) {
 }
 
 
-void test_rasa_set_missing_rasa_sets_key(void) {
+static void test_rasa_set_missing_rasa_sets_key(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"other_key\": \"value\"}";
@@ -881,7 +881,7 @@ void test_rasa_set_missing_rasa_sets_key(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_missing_as_set_name(void) {
+static void test_rasa_set_missing_as_set_name(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"members\":[64496]}}]}";
@@ -894,7 +894,7 @@ void test_rasa_set_missing_as_set_name(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_non_integer_member(void) {
+static void test_rasa_set_non_integer_member(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496,\"not-an-int\",64497]}}]}";
@@ -909,7 +909,7 @@ void test_rasa_set_non_integer_member(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_reuse_config_struct(void) {
+static void test_rasa_set_reuse_config_struct(void) {
     struct rasa_set_config cfg = {0};
     const char *json1 = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496]}}]}";
     const char *json2 = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST2\",\"members\":[64497]}}]}";
@@ -925,12 +925,12 @@ void test_rasa_set_reuse_config_struct(void) {
     clean_temp(path2);
 }
 
-void test_rasa_set_free_null_config(void) {
+static void test_rasa_set_free_null_config(void) {
     struct rasa_set_config cfg = {0};
     rasa_set_free_config(&cfg);
 }
 
-void test_rasa_set_many_sets(void) {
+static void test_rasa_set_many_sets(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     char json[4096];
@@ -955,7 +955,7 @@ void test_rasa_set_many_sets(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_many_members(void) {
+static void test_rasa_set_many_members(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     char json[4096];
@@ -980,7 +980,7 @@ void test_rasa_set_many_members(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_asn_not_in_any_set(void) {
+static void test_rasa_set_asn_not_in_any_set(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496]}}]}";
@@ -993,7 +993,7 @@ void test_rasa_set_asn_not_in_any_set(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_whitespace_in_name(void) {
+static void test_rasa_set_whitespace_in_name(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64496]}}]}";
@@ -1006,7 +1006,7 @@ void test_rasa_set_whitespace_in_name(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_long_set_name(void) {
+static void test_rasa_set_long_set_name(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     char set_name[256];
@@ -1024,7 +1024,7 @@ void test_rasa_set_long_set_name(void) {
 }
 
 
-void test_rasa_set_extra_fields_ignored(void) {
+static void test_rasa_set_extra_fields_ignored(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"extra\":\"ignored\",\"members\":[64496,\"extra\":123]}}],\"other\":\"ignored\"}";
@@ -1037,7 +1037,7 @@ void test_rasa_set_extra_fields_ignored(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_minimal_valid(void) {
+static void test_rasa_set_minimal_valid(void) {
     struct rasa_set_config cfg = {0};
     const char *json = "{\"rasa_sets\":[]}";
     char *path = make_temp(json);
@@ -1047,7 +1047,7 @@ void test_rasa_set_minimal_valid(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_nested_sets_declaration(void) {
+static void test_rasa_set_nested_sets_declaration(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-PARENT\",\"members\":[64496],\"nested\":[{\"entry\":{\"as_set\":\"AS-CHILD\"}}]}}]}";
@@ -1060,7 +1060,7 @@ void test_rasa_set_nested_sets_declaration(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_containing_as_field(void) {
+static void test_rasa_set_containing_as_field(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"containing_as\":64496,\"members\":[64497,64498]}}]}";
@@ -1073,7 +1073,7 @@ void test_rasa_set_containing_as_field(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_load_empty_object(void) {
+static void test_rasa_set_load_empty_object(void) {
     struct rasa_set_config cfg = {0};
     const char *json = "{}";
     char *path = make_temp(json);
@@ -1084,7 +1084,7 @@ void test_rasa_set_load_empty_object(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_negative_member_asn(void) {
+static void test_rasa_set_negative_member_asn(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[-1,64496]}}]}";
@@ -1097,7 +1097,7 @@ void test_rasa_set_negative_member_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_large_member_list_mixed(void) {
+static void test_rasa_set_large_member_list_mixed(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[0,1,65535,65536,4200000000,64496]}}]}";
@@ -1114,7 +1114,7 @@ void test_rasa_set_large_member_list_mixed(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_multiple_same_asn_different_sets(void) {
+static void test_rasa_set_multiple_same_asn_different_sets(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-SET1\",\"members\":[64496]}},{\"rasa_set\":{\"as_set_name\":\"AS-SET2\",\"members\":[64496]}},{\"rasa_set\":{\"as_set_name\":\"AS-SET3\",\"members\":[64496]}}]}";
@@ -1131,7 +1131,7 @@ void test_rasa_set_multiple_same_asn_different_sets(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_members_array_with_nulls(void) {
+static void test_rasa_set_members_array_with_nulls(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[null,64496,null]}}]}";
@@ -1144,7 +1144,7 @@ void test_rasa_set_members_array_with_nulls(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_boolean_in_members(void) {
+static void test_rasa_set_boolean_in_members(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[true,false,64496]}}]}";
@@ -1162,7 +1162,7 @@ void test_rasa_set_boolean_in_members(void) {
  * Bidirectional Verification Tests (30+ scenarios)
  * ============================================ */
 
-void test_bidirectional_both_authorize(void) {
+static void test_bidirectional_both_authorize(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1188,7 +1188,7 @@ void test_bidirectional_both_authorize(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_only_auth(void) {
+static void test_bidirectional_only_auth(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1214,7 +1214,7 @@ void test_bidirectional_only_auth(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_only_set(void) {
+static void test_bidirectional_only_set(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1240,7 +1240,7 @@ void test_bidirectional_only_set(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_neither_authorize(void) {
+static void test_bidirectional_neither_authorize(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1266,7 +1266,7 @@ void test_bidirectional_neither_authorize(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_auth_denies_set_allows(void) {
+static void test_bidirectional_auth_denies_set_allows(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1296,7 +1296,7 @@ void test_bidirectional_auth_denies_set_allows(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_auth_allows_set_denies(void) {
+static void test_bidirectional_auth_allows_set_denies(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1324,7 +1324,7 @@ void test_bidirectional_auth_allows_set_denies(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_multiple_asns_mixed(void) {
+static void test_bidirectional_multiple_asns_mixed(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1362,7 +1362,7 @@ void test_bidirectional_multiple_asns_mixed(void) {
 }
 
 
-void test_bidirectional_no_configs(void) {
+static void test_bidirectional_no_configs(void) {
     struct rasa_auth auth_result = {0};
     struct rasa_set_membership set_result = {0};
     
@@ -1372,7 +1372,7 @@ void test_bidirectional_no_configs(void) {
     ASSERT_EQ(set_result.is_member, 1);
 }
 
-void test_bidirectional_null_auth_result(void) {
+static void test_bidirectional_null_auth_result(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_set_membership set_result = {0};
@@ -1395,7 +1395,7 @@ void test_bidirectional_null_auth_result(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_null_set_result(void) {
+static void test_bidirectional_null_set_result(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1418,7 +1418,7 @@ void test_bidirectional_null_set_result(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_32bit_asn(void) {
+static void test_bidirectional_32bit_asn(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1444,7 +1444,7 @@ void test_bidirectional_32bit_asn(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_multiple_assets(void) {
+static void test_bidirectional_multiple_assets(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1474,7 +1474,7 @@ void test_bidirectional_multiple_assets(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_wrong_asset_both_loaded(void) {
+static void test_bidirectional_wrong_asset_both_loaded(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1501,7 +1501,7 @@ void test_bidirectional_wrong_asset_both_loaded(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_empty_members_vs_empty_auth(void) {
+static void test_bidirectional_empty_members_vs_empty_auth(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1527,7 +1527,7 @@ void test_bidirectional_empty_members_vs_empty_auth(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_asn_zero(void) {
+static void test_bidirectional_asn_zero(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1553,7 +1553,7 @@ void test_bidirectional_asn_zero(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_special_chars_asset(void) {
+static void test_bidirectional_special_chars_asset(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1579,7 +1579,7 @@ void test_bidirectional_special_chars_asset(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_large_asn_16bit_boundary(void) {
+static void test_bidirectional_large_asn_16bit_boundary(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1606,7 +1606,7 @@ void test_bidirectional_large_asn_16bit_boundary(void) {
 }
 
 
-void test_bidirectional_many_asns(void) {
+static void test_bidirectional_many_asns(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1655,7 +1655,7 @@ void test_bidirectional_many_asns(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_partial_overlap(void) {
+static void test_bidirectional_partial_overlap(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1694,7 +1694,7 @@ void test_bidirectional_partial_overlap(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_null_asset(void) {
+static void test_bidirectional_null_asset(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1720,7 +1720,7 @@ void test_bidirectional_null_asset(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_case_sensitive_asset(void) {
+static void test_bidirectional_case_sensitive_asset(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1747,7 +1747,7 @@ void test_bidirectional_case_sensitive_asset(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_complex_scenario(void) {
+static void test_bidirectional_complex_scenario(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1800,7 +1800,7 @@ void test_bidirectional_complex_scenario(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_minimal_configs(void) {
+static void test_bidirectional_minimal_configs(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1828,7 +1828,7 @@ void test_bidirectional_minimal_configs(void) {
 }
 
 
-void test_bidirectional_different_asn_in_each(void) {
+static void test_bidirectional_different_asn_in_each(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1861,7 +1861,7 @@ void test_bidirectional_different_asn_in_each(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_same_config_file(void) {
+static void test_bidirectional_same_config_file(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1885,7 +1885,7 @@ void test_bidirectional_same_config_file(void) {
     clean_temp(path);
 }
 
-void test_bidirectional_large_scale(void) {
+static void test_bidirectional_large_scale(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1945,7 +1945,7 @@ void test_bidirectional_large_scale(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_reload_configs(void) {
+static void test_bidirectional_reload_configs(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -1996,7 +1996,7 @@ void test_bidirectional_reload_configs(void) {
     clean_temp(set_path2);
 }
 
-void test_bidirectional_extra_json_fields(void) {
+static void test_bidirectional_extra_json_fields(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -2022,7 +2022,7 @@ void test_bidirectional_extra_json_fields(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_default_allow_behavior(void) {
+static void test_bidirectional_default_allow_behavior(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -2059,7 +2059,7 @@ void test_bidirectional_default_allow_behavior(void) {
  * Additional Edge Case Tests
  * ============================================ */
 
-void test_rasa_auth_very_large_asn(void) {
+static void test_rasa_auth_very_large_asn(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     /* Maximum 32-bit unsigned value */
@@ -2073,7 +2073,7 @@ void test_rasa_auth_very_large_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_very_large_asn(void) {
+static void test_rasa_set_very_large_asn(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[4294967295]}}]}";
@@ -2086,7 +2086,7 @@ void test_rasa_set_very_large_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_private_asn(void) {
+static void test_rasa_auth_private_asn(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     /* Private ASN range */
@@ -2100,7 +2100,7 @@ void test_rasa_auth_private_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_private_asn(void) {
+static void test_rasa_set_private_asn(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     const char *json = "{\"rasa_sets\":[{\"rasa_set\":{\"as_set_name\":\"AS-TEST\",\"members\":[64512,65534]}}]}";
@@ -2115,7 +2115,7 @@ void test_rasa_set_private_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_reserved_asn(void) {
+static void test_rasa_auth_reserved_asn(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     /* ASN 23456 is reserved for AS_TRANS */
@@ -2129,7 +2129,7 @@ void test_rasa_auth_reserved_asn(void) {
     clean_temp(path);
 }
 
-void test_rasa_auth_nested_arrays(void) {
+static void test_rasa_auth_nested_arrays(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
     /* Test handling of nested arrays that might cause issues */
@@ -2145,7 +2145,7 @@ void test_rasa_auth_nested_arrays(void) {
     clean_temp(path);
 }
 
-void test_rasa_set_mixed_types_in_members(void) {
+static void test_rasa_set_mixed_types_in_members(void) {
     struct rasa_set_config cfg = {0};
     struct rasa_set_membership result = {0};
     /* Test that non-integer members are skipped gracefully */
@@ -2161,7 +2161,7 @@ void test_rasa_set_mixed_types_in_members(void) {
     clean_temp(path);
 }
 
-void test_bidirectional_very_large_asn(void) {
+static void test_bidirectional_very_large_asn(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -2187,7 +2187,7 @@ void test_bidirectional_very_large_asn(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_private_asns(void) {
+static void test_bidirectional_private_asns(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};
@@ -2213,7 +2213,7 @@ void test_bidirectional_private_asns(void) {
     clean_temp(set_path);
 }
 
-void test_bidirectional_as_trans(void) {
+static void test_bidirectional_as_trans(void) {
     struct rasa_config auth_cfg = {0};
     struct rasa_set_config set_cfg = {0};
     struct rasa_auth auth_result = {0};

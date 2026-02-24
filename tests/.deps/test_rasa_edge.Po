@@ -1,4 +1,4 @@
-tests/test_rasa.o: tests/test_rasa.c \
+tests/test_rasa_edge.o: tests/test_rasa_edge.c \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdio.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_bounds.h \
