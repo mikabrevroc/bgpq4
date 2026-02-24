@@ -115,8 +115,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man8dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_bgpq4_OBJECTS = main.$(OBJEXT) printer.$(OBJEXT) expander.$(OBJEXT) \
-	rasa.$(OBJEXT) sx_prefix.$(OBJEXT) sx_report.$(OBJEXT) \
-	sx_slentry.$(OBJEXT)
+	rasa.$(OBJEXT) rasa_hash.$(OBJEXT) sx_prefix.$(OBJEXT) \
+	sx_report.$(OBJEXT) sx_slentry.$(OBJEXT)
 bgpq4_OBJECTS = $(am_bgpq4_OBJECTS)
 am__DEPENDENCIES_1 =
 bgpq4_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__append_2)
@@ -125,25 +125,28 @@ am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am__dirstamp = $(am__leading_dot)dirstamp
-am_test_rasa_OBJECTS = tests/test_rasa.$(OBJEXT) rasa.$(OBJEXT)
+am_test_rasa_OBJECTS = tests/test_rasa.$(OBJEXT) rasa.$(OBJEXT) \
+	rasa_hash.$(OBJEXT)
 test_rasa_OBJECTS = $(am_test_rasa_OBJECTS)
 test_rasa_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_rasa_auth_OBJECTS = tests/test_rasa_auth.$(OBJEXT) \
-	rasa.$(OBJEXT)
+	rasa.$(OBJEXT) rasa_hash.$(OBJEXT)
 test_rasa_auth_OBJECTS = $(am_test_rasa_auth_OBJECTS)
 test_rasa_auth_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_rasa_bidirectional_OBJECTS =  \
-	tests/test_rasa_bidirectional.$(OBJEXT) rasa.$(OBJEXT)
+	tests/test_rasa_bidirectional.$(OBJEXT) rasa.$(OBJEXT) \
+	rasa_hash.$(OBJEXT)
 test_rasa_bidirectional_OBJECTS =  \
 	$(am_test_rasa_bidirectional_OBJECTS)
 test_rasa_bidirectional_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_rasa_bidirectional2_OBJECTS =  \
-	tests/test_rasa_bidirectional2.$(OBJEXT) rasa.$(OBJEXT)
+	tests/test_rasa_bidirectional2.$(OBJEXT) rasa.$(OBJEXT) \
+	rasa_hash.$(OBJEXT)
 test_rasa_bidirectional2_OBJECTS =  \
 	$(am_test_rasa_bidirectional2_OBJECTS)
 test_rasa_bidirectional2_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_rasa_edge_OBJECTS = tests/test_rasa_edge.$(OBJEXT) \
-	rasa.$(OBJEXT)
+	rasa.$(OBJEXT) rasa_hash.$(OBJEXT)
 test_rasa_edge_OBJECTS = $(am_test_rasa_edge_OBJECTS)
 test_rasa_edge_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_rasa_integration_OBJECTS =  \
@@ -153,11 +156,11 @@ am_test_rasa_integration_OBJECTS =  \
 test_rasa_integration_OBJECTS = $(am_test_rasa_integration_OBJECTS)
 test_rasa_integration_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_rasa_minimal_OBJECTS = tests/test_rasa_minimal.$(OBJEXT) \
-	rasa.$(OBJEXT)
+	rasa.$(OBJEXT) rasa_hash.$(OBJEXT)
 test_rasa_minimal_OBJECTS = $(am_test_rasa_minimal_OBJECTS)
 test_rasa_minimal_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_test_rasa_set_OBJECTS = tests/test_rasa_set.$(OBJEXT) \
-	rasa.$(OBJEXT)
+	rasa.$(OBJEXT) rasa_hash.$(OBJEXT)
 test_rasa_set_OBJECTS = $(am_test_rasa_set_OBJECTS)
 test_rasa_set_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_$(V))
@@ -177,9 +180,9 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/expander.Po ./$(DEPDIR)/main.Po \
 	./$(DEPDIR)/printer.Po ./$(DEPDIR)/rasa.Po \
-	./$(DEPDIR)/sx_prefix.Po ./$(DEPDIR)/sx_report.Po \
-	./$(DEPDIR)/sx_slentry.Po tests/$(DEPDIR)/test_rasa.Po \
-	tests/$(DEPDIR)/test_rasa_auth.Po \
+	./$(DEPDIR)/rasa_hash.Po ./$(DEPDIR)/sx_prefix.Po \
+	./$(DEPDIR)/sx_report.Po ./$(DEPDIR)/sx_slentry.Po \
+	tests/$(DEPDIR)/test_rasa.Po tests/$(DEPDIR)/test_rasa_auth.Po \
 	tests/$(DEPDIR)/test_rasa_bidirectional.Po \
 	tests/$(DEPDIR)/test_rasa_bidirectional2.Po \
 	tests/$(DEPDIR)/test_rasa_edge.Po \
@@ -468,26 +471,26 @@ AUTOMAKE_OPTIONS = foreign subdir-objects
 dist_man8_MANS = bgpq4.8
 bgpq4_LDADD = $(PLATFORM_LDADD) $(PROG_LDADD) $(JANSSON_LIBS) \
 	$(am__append_2)
-bgpq4_SOURCES = main.c extern.h printer.c expander.c rasa.c rasa.h \
+bgpq4_SOURCES = main.c extern.h printer.c expander.c rasa.c rasa.h rasa_hash.c rasa_hash.h \
     sx_prefix.c sx_prefix.h \
     sx_report.c sx_report.h \
     sx_slentry.c
 
-test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h
+test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_LDADD = $(JANSSON_LIBS)
 test_rasa_integration_SOURCES = tests/test_rasa_integration.c expander.c rasa.c extern.h rasa.h sx_prefix.c sx_report.c sx_slentry.c
 test_rasa_integration_LDADD = $(JANSSON_LIBS) $(PLATFORM_LDADD)
-test_rasa_minimal_SOURCES = tests/test_rasa_minimal.c rasa.c rasa.h
+test_rasa_minimal_SOURCES = tests/test_rasa_minimal.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_minimal_LDADD = $(JANSSON_LIBS)
-test_rasa_auth_SOURCES = tests/test_rasa_auth.c rasa.c rasa.h
+test_rasa_auth_SOURCES = tests/test_rasa_auth.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_auth_LDADD = $(JANSSON_LIBS)
-test_rasa_set_SOURCES = tests/test_rasa_set.c rasa.c rasa.h
+test_rasa_set_SOURCES = tests/test_rasa_set.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_set_LDADD = $(JANSSON_LIBS)
-test_rasa_bidirectional_SOURCES = tests/test_rasa_bidirectional.c rasa.c rasa.h
+test_rasa_bidirectional_SOURCES = tests/test_rasa_bidirectional.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_bidirectional_LDADD = $(JANSSON_LIBS)
-test_rasa_bidirectional2_SOURCES = tests/test_rasa_bidirectional2.c rasa.c rasa.h
+test_rasa_bidirectional2_SOURCES = tests/test_rasa_bidirectional2.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_bidirectional2_LDADD = $(JANSSON_LIBS)
-test_rasa_edge_SOURCES = tests/test_rasa_edge.c rasa.c rasa.h
+test_rasa_edge_SOURCES = tests/test_rasa_edge.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_edge_LDADD = $(JANSSON_LIBS)
 EXTRA_DIST = bootstrap README.md CHANGES
 MAINTAINERCLEANFILES = configure aclocal.m4 compile \
@@ -651,6 +654,7 @@ include ./$(DEPDIR)/expander.Po # am--include-marker
 include ./$(DEPDIR)/main.Po # am--include-marker
 include ./$(DEPDIR)/printer.Po # am--include-marker
 include ./$(DEPDIR)/rasa.Po # am--include-marker
+include ./$(DEPDIR)/rasa_hash.Po # am--include-marker
 include ./$(DEPDIR)/sx_prefix.Po # am--include-marker
 include ./$(DEPDIR)/sx_report.Po # am--include-marker
 include ./$(DEPDIR)/sx_slentry.Po # am--include-marker
@@ -1105,6 +1109,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f ./$(DEPDIR)/printer.Po
 	-rm -f ./$(DEPDIR)/rasa.Po
+	-rm -f ./$(DEPDIR)/rasa_hash.Po
 	-rm -f ./$(DEPDIR)/sx_prefix.Po
 	-rm -f ./$(DEPDIR)/sx_report.Po
 	-rm -f ./$(DEPDIR)/sx_slentry.Po
@@ -1167,6 +1172,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/main.Po
 	-rm -f ./$(DEPDIR)/printer.Po
 	-rm -f ./$(DEPDIR)/rasa.Po
+	-rm -f ./$(DEPDIR)/rasa_hash.Po
 	-rm -f ./$(DEPDIR)/sx_prefix.Po
 	-rm -f ./$(DEPDIR)/sx_report.Po
 	-rm -f ./$(DEPDIR)/sx_slentry.Po

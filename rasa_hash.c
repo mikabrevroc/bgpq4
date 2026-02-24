@@ -1,17 +1,8 @@
 #include "rasa_hash.h"
- * Copyright (c) 2025 RASA Project
- * All rights reserved.
- *
- * RASA (RPKI AS-SET Authorization) hash table implementation
- * For O(1) lookup of RASA-SET entries by AS-SET name
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
-
-#include "rasa_hash.h"
 
 static unsigned long
 hash_string(const char *str)
@@ -20,10 +11,6 @@ hash_string(const char *str)
     int c;
     while ((c = *str++))
         hash = ((hash << 5) + hash) + c;
-
-    return hash;
-}
-
     return hash;
 }
 
@@ -32,7 +19,6 @@ hash_asset(const char *asset)
 {
     unsigned long hash = 5381;
     int c;
-
     while ((c = *asset++)) {
         if (c >= 'a' && c <= 'z')
             c = c - 'a' + 'A';
@@ -47,9 +33,11 @@ asset_cmp(const char *a, const char *b)
     while (*a && *b) {
         char ca = *a;
         char cb = *b;
+        if (ca >= 'a' && ca <= 'z')
             ca = ca - 'a' + 'A';
         if (cb >= 'a' && cb <= 'z')
             cb = cb - 'a' + 'A';
+        if (ca != cb)
             return ca - cb;
         a++;
         b++;
@@ -94,7 +82,6 @@ rasa_hash_table_free(struct rasa_hash_table *table)
         while (bucket) {
             struct rasa_hash_bucket *next = bucket->next;
             
-            /* Free the entry data */
             if (bucket->entry) {
                 if (bucket->entry->as_set_name)
                     free(bucket->entry->as_set_name);
@@ -133,7 +120,6 @@ rasa_hash_table_resize(struct rasa_hash_table *table)
     if (!new_buckets)
         return -1;
     
-    /* Rehash all entries */
     for (i = 0; i < table->capacity; i++) {
         struct rasa_hash_bucket *bucket = table->buckets[i];
         while (bucket) {
@@ -141,7 +127,6 @@ rasa_hash_table_resize(struct rasa_hash_table *table)
             unsigned long new_hash = hash_asset(bucket->entry->as_set_name);
             size_t new_idx = new_hash % new_capacity;
             
-            /* Insert into new bucket */
             bucket->next = new_buckets[new_idx];
             new_buckets[new_idx] = bucket;
             
@@ -166,7 +151,6 @@ rasa_hash_table_insert(struct rasa_hash_table *table, struct rasa_set_entry *ent
     if (!table || !entry || !entry->as_set_name)
         return -1;
     
-    /* Check if we need to resize (load factor > 0.75) */
     if (table->count > table->capacity * 3 / 4) {
         if (rasa_hash_table_resize(table) != 0)
             return -1;
@@ -175,17 +159,14 @@ rasa_hash_table_insert(struct rasa_hash_table *table, struct rasa_set_entry *ent
     hash = hash_asset(entry->as_set_name);
     idx = hash % table->capacity;
     
-    /* Check if entry already exists */
     bucket = table->buckets[idx];
     while (bucket) {
         if (asset_cmp(bucket->entry->as_set_name, entry->as_set_name) == 0) {
-            /* Entry exists - this is an error (multiple RASA-SETs for same AS-SET) */
-            return -2;  /* Special error code for duplicate */
+            return -2;
         }
         bucket = bucket->next;
     }
     
-    /* Create new bucket */
     bucket = calloc(1, sizeof(*bucket));
     if (!bucket)
         return -1;
@@ -193,7 +174,6 @@ rasa_hash_table_insert(struct rasa_hash_table *table, struct rasa_set_entry *ent
     bucket->entry = entry;
     bucket->hash = hash;
     
-    /* Insert at head of chain */
     bucket->next = table->buckets[idx];
     table->buckets[idx] = bucket;
     table->count++;
@@ -240,13 +220,11 @@ rasa_hash_table_remove(struct rasa_hash_table *table, const char *as_set_name)
     bucket = table->buckets[idx];
     while (bucket) {
         if (asset_cmp(bucket->entry->as_set_name, as_set_name) == 0) {
-            /* Found it - remove from chain */
             if (prev)
                 prev->next = bucket->next;
             else
                 table->buckets[idx] = bucket->next;
             
-            /* Free entry data */
             if (bucket->entry) {
                 if (bucket->entry->as_set_name)
                     free(bucket->entry->as_set_name);
@@ -256,10 +234,9 @@ rasa_hash_table_remove(struct rasa_hash_table *table, const char *as_set_name)
                     free(bucket->entry->members);
                 if (bucket->entry->nested_sets) {
                     size_t i;
-                    for (i = 0; i < bucket->entry->num_nested; i++) {
+                    for (i = 0; i < bucket->entry->num_nested; i++)
                         if (bucket->entry->nested_sets[i])
                             free(bucket->entry->nested_sets[i]);
-                    }
                     free(bucket->entry->nested_sets);
                 }
                 free(bucket->entry);
@@ -273,7 +250,7 @@ rasa_hash_table_remove(struct rasa_hash_table *table, const char *as_set_name)
         bucket = bucket->next;
     }
     
-    return -1;  /* Not found */
+    return -1;
 }
 
 size_t

@@ -205,8 +205,8 @@ main(int argc, char* argv[])
 	if (getenv("IRRD_SOURCES"))
 		expander.sources=getenv("IRRD_SOURCES");
 
-	while ((c = getopt(argc, argv,
-    '23467a:AbBdDEeF:S:jJKf:l:L:m:M:NnpW:r:R:G:H:tTh:UuwXsvzYy:Y:')) != EOF) {
+		while ((c = getopt(argc, argv,
+    "23467a:AbBdDEeF:S:jJKf:l:L:m:M:NnpW:r:R:G:H:tTh:UuwXsvzY:y:")) != EOF) {
 	switch (c) {
 	case '2':
 		if (expander.vendor != V_NOKIA_MD) {
@@ -465,14 +465,11 @@ main(int argc, char* argv[])
 		break;
 #ifdef HAVE_JANSSON
 	case 'Y':
-		if (!expander.rasa) {
-			expander.rasa = calloc(1, sizeof(struct rasa_config));
-			if (!expander.rasa) {
-				sx_report(SX_FATAL, "Failed to allocate RASA config\n");
-				exit(1);
-			}
+		if (rasa_load_sets_from_json(optarg) != 0) {
+			sx_report(SX_FATAL, "Failed to load RASA-SETs from %s\n",
+			    optarg);
+			exit(1);
 		}
-		expander.rasa->enabled = 1;
 		break;
 	case 'y':
 		if (!expander.rasa) {
@@ -484,13 +481,6 @@ main(int argc, char* argv[])
 		}
 		if (rasa_load_config(expander.rasa, optarg) != 0) {
 			sx_report(SX_FATAL, "Failed to load RASA config from %s\n",
-			    optarg);
-			exit(1);
-		}
-		break;
-	case 'Y':
-		if (rasa_load_sets_from_json(optarg) != 0) {
-			sx_report(SX_FATAL, "Failed to load RASA-SETs from %s\n",
 			    optarg);
 			exit(1);
 		}

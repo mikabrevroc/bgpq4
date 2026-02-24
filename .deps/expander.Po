@@ -184,7 +184,17 @@ expander.o: expander.c include/sys/types.h \
   extern.h include/sys/queue.h include/sys/_null.h include/sys/tree.h \
   sx_prefix.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arpa/inet.h \
-  rasa.h sx_report.h
+  rasa.h sx_report.h rasa_hash.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/stddef.h \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stddef.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_header_macro.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_ptrdiff_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_size_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_rsize_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_wchar_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_null.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_max_align_t.h \
+  /Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_offsetof.h
 include/sys/types.h:
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/types.h:
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/appleapiopts.h:
@@ -376,3 +386,14 @@ sx_prefix.h:
 /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/arpa/inet.h:
 rasa.h:
 sx_report.h:
+rasa_hash.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/stddef.h:
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stddef.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_header_macro.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_ptrdiff_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_size_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_rsize_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_wchar_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_null.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_max_align_t.h:
+/Library/Developer/CommandLineTools/usr/lib/clang/17/include/__stddef_offsetof.h:

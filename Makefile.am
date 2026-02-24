@@ -16,7 +16,7 @@ SUBDIRS += compat
 bgpq4_LDADD += $(top_builddir)/compat/libcompat.la
 endif
 
-bgpq4_SOURCES=main.c extern.h printer.c expander.c rasa.c rasa.h \
+bgpq4_SOURCES=main.c extern.h printer.c expander.c rasa.c rasa.h rasa_hash.c rasa_hash.h \
     sx_prefix.c sx_prefix.h \
     sx_report.c sx_report.h \
     sx_slentry.c
@@ -24,28 +24,28 @@ bgpq4_SOURCES=main.c extern.h printer.c expander.c rasa.c rasa.h \
 check_PROGRAMS = test_rasa test_rasa_integration test_rasa_minimal \
     test_rasa_auth test_rasa_set test_rasa_bidirectional test_rasa_bidirectional2 test_rasa_edge
 
-test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h
+test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_LDADD = $(JANSSON_LIBS)
 
 test_rasa_integration_SOURCES = tests/test_rasa_integration.c expander.c rasa.c extern.h rasa.h sx_prefix.c sx_report.c sx_slentry.c
 test_rasa_integration_LDADD = $(JANSSON_LIBS) $(PLATFORM_LDADD)
 
-test_rasa_minimal_SOURCES = tests/test_rasa_minimal.c rasa.c rasa.h
+test_rasa_minimal_SOURCES = tests/test_rasa_minimal.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_minimal_LDADD = $(JANSSON_LIBS)
 
-test_rasa_auth_SOURCES = tests/test_rasa_auth.c rasa.c rasa.h
+test_rasa_auth_SOURCES = tests/test_rasa_auth.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_auth_LDADD = $(JANSSON_LIBS)
 
-test_rasa_set_SOURCES = tests/test_rasa_set.c rasa.c rasa.h
+test_rasa_set_SOURCES = tests/test_rasa_set.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_set_LDADD = $(JANSSON_LIBS)
 
-test_rasa_bidirectional_SOURCES = tests/test_rasa_bidirectional.c rasa.c rasa.h
+test_rasa_bidirectional_SOURCES = tests/test_rasa_bidirectional.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_bidirectional_LDADD = $(JANSSON_LIBS)
 
-test_rasa_bidirectional2_SOURCES = tests/test_rasa_bidirectional2.c rasa.c rasa.h
+test_rasa_bidirectional2_SOURCES = tests/test_rasa_bidirectional2.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_bidirectional2_LDADD = $(JANSSON_LIBS)
 
-test_rasa_edge_SOURCES = tests/test_rasa_edge.c rasa.c rasa.h
+test_rasa_edge_SOURCES = tests/test_rasa_edge.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_edge_LDADD = $(JANSSON_LIBS)
 
 EXTRA_DIST=bootstrap README.md CHANGES
