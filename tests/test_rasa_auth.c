@@ -489,7 +489,7 @@ static void test_rasa_auth_many_assets(void) {
         snprintf(entry, sizeof(entry), "{\"entry\":{\"asset\":\"AS-SET%d\"}}", i);
         strcat(json, entry);
     }
-    strcat(json, "]}}}]}");
+    strcat(json, "]}}]}");
     char *path = make_temp(json);
     ASSERT(path);
     rasa_load_config(&cfg, path);
