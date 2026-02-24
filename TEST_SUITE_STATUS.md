@@ -11,13 +11,16 @@ Successfully split the comprehensive RASA test suite (2393 lines, 119 tests) int
 
 | File | Tests | Status | Notes |
 |------|-------|--------|-------|
-| test_rasa_auth.c | 40 | 39/40 passing | 1 test expects AS-SET100 to not be authorized but returns authorized (minor logic issue) |
+| test_rasa_auth.c | 40 | 40/40 passing | All tests pass |
 | test_rasa_set.c | 40 | 40/40 passing | All tests pass |
 | test_rasa_bidirectional.c | 6 | 6/6 passing | All tests pass |
 | test_rasa_bidirectional2.c | 20 | 20/20 passing | All tests pass |
 | test_rasa_edge.c | 10 | 10/10 passing | All tests pass |
+| test_rasa.c | 2 | 2/2 passing | Original RASA tests |
+| test_rasa_integration.c | 2 | 2/2 passing | Integration tests |
+| test_rasa_minimal.c | 3 | 3/3 passing | Minimal test suite |
 
-**Total: 111/112 tests passing (99.1%)**
+**Total: 123/123 tests passing (100%)**
 
 ## Fixes Applied
 
@@ -28,6 +31,7 @@ Successfully split the comprehensive RASA test suite (2393 lines, 119 tests) int
 ### tests/test_rasa_auth.c
 1. Increased buffer size for `test_rasa_auth_many_asns` from 4096 to 16384 bytes
 2. Increased buffer size for `test_rasa_auth_many_assets` from 8192 to 32768 bytes
+3. Fixed JSON syntax error in `test_rasa_auth_many_assets` - changed `]}}}]` to `]}}]}`
 
 ### Makefile.am
 - Replaced `test_rasa_comprehensive` with 5 new test targets
@@ -46,11 +50,10 @@ make test_rasa_edge
 
 ## Known Issues
 
-1. **test_rasa_auth_many_assets**: Test expects `AS-SET100` to not be in the authorized list, but the implementation returns `authorized=1`. This appears to be a test logic issue rather than an implementation bug.
+None - all tests passing!
 
 ## Remaining Work
 
-- [ ] Fix test_rasa_auth_many_assets test logic
 - [ ] Remove old comprehensive test file once fully migrated
 - [ ] Update CI/CD to run new test targets
 
@@ -58,6 +61,7 @@ make test_rasa_edge
 
 - `bb0f780` fix(rasa): add NULL checks and handle empty arrays
 - `2ad701a` build: add split test suite targets to Makefile.am
+- `7c5e40c` test(auth): fix JSON syntax error in many_assets test
 - `e5e3f12` test: split comprehensive test suite into 5 smaller files
 - `e563659` test: add validation script for split test suite
 
