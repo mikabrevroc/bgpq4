@@ -66,7 +66,22 @@ MAINTAINERCLEANFILES=configure aclocal.m4 compile \
 maintainer-clean-local:
 	-rm -rf m4 autom4te.cache
 
-check:
+# Generate RASA test fixtures from Python generators
+fixtures:
+	@echo "Generating RASA test fixtures..."
+	cd tests/generator && python3 fixture_generator.py
+	@echo "Generated $(ls tests/fixtures/*.json 2>/dev/null | wc -l) fixtures"
+
+# Quick test with representative sample (no fixture generation needed)
+check-sample:
+	@echo "Running tests with sample fixtures only..."
+	./test_rasa
+	./test_rasa_auth
+	./test_rasa_set
+	./test_rasa_realworld
+	./test_rasa_edge
+
+check: check-sample
 	./bgpq4 -v
 	@echo
 	-if [ -s /etc/resolv.conf ]; then \
@@ -74,3 +89,7 @@ check:
 	else \
 		echo "No or empty /etc/resolv.conf, skipping online test"; \
 	fi
+
+check-full: fixtures check
+	@echo "Running full test suite with all fixtures..."
+	./test_rasa_fixtures
