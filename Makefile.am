@@ -27,7 +27,7 @@ check_PROGRAMS = test_rasa test_rasa_integration test_rasa_minimal \
 test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_LDADD = $(JANSSON_LIBS)
 
-test_rasa_integration_SOURCES = tests/test_rasa_integration.c expander.c rasa.c extern.h rasa.h sx_prefix.c sx_report.c sx_slentry.c
+test_rasa_integration_SOURCES = tests/test_rasa_integration.c expander.c rasa.c rasa_hash.c extern.h rasa.h rasa_hash.h sx_prefix.c sx_report.c sx_slentry.c
 test_rasa_integration_LDADD = $(JANSSON_LIBS) $(PLATFORM_LDADD)
 
 test_rasa_minimal_SOURCES = tests/test_rasa_minimal.c rasa.c rasa.h rasa_hash.c rasa_hash.h
