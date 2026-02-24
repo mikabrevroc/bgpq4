@@ -26,7 +26,7 @@ static void test_hurricane_electric(void) {
     struct rasa_set_config config;
     memset(&config, 0, sizeof(config));
     
-    int result = rasa_set_load_config(&config, "tests/fixtures/edge_hurricane_electric_pattern.json");
+    int result = rasa_set_load_config(&config, "tests/fixtures/sample/edge_hurricane_electric_pattern.json");
     
     TEST_ASSERT(result == 0, "HE config loaded");
     TEST_ASSERT(config.enabled == 1, "Config enabled");
@@ -42,7 +42,7 @@ static void test_google(void) {
     struct rasa_set_config config;
     memset(&config, 0, sizeof(config));
     
-    int result = rasa_set_load_config(&config, "tests/fixtures/edge_google_rasaonly_pattern.json");
+    int result = rasa_set_load_config(&config, "tests/fixtures/sample/edge_google_rasaonly_pattern.json");
     
     TEST_ASSERT(result == 0, "Google config loaded");
     TEST_ASSERT(config.enabled == 1, "Config enabled");
@@ -68,7 +68,7 @@ static void test_multilevel(void) {
     struct rasa_set_config config;
     memset(&config, 0, sizeof(config));
     
-    int result = rasa_set_load_config(&config, "tests/fixtures/hierarchy_2level_irrFallback_1.json");
+    int result = rasa_set_load_config(&config, "tests/fixtures/sample/hierarchy_2level_irrFallback_1.json");
     
     TEST_ASSERT(result == 0, "Multi-level config loaded");
     TEST_ASSERT(config.enabled == 1, "Config enabled");
