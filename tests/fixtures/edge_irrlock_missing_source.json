@@ -1,0 +1,18 @@
+{
+  "name": "irrlock_missing_source",
+  "description": "irrLock mode without irr_source should fail",
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-INVALID-LOCK",
+        "containing_as": 64496,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrLock",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "expected_error": "irrLock requires irr_source"
+}

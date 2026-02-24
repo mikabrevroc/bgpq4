@@ -1,0 +1,35 @@
+{
+  "name": "circular_reference_2level",
+  "description": "AS-A includes AS-B, AS-B includes AS-A",
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-A",
+        "containing_as": 64496,
+        "members": [
+          64497
+        ],
+        "nested_sets": [
+          "AS-B"
+        ],
+        "fallback_mode": "irrFallback",
+        "flags": []
+      }
+    },
+    {
+      "rasa_set": {
+        "as_set_name": "AS-B",
+        "containing_as": 64497,
+        "members": [
+          64498
+        ],
+        "nested_sets": [
+          "AS-A"
+        ],
+        "fallback_mode": "irrFallback",
+        "flags": []
+      }
+    }
+  ],
+  "expected_warning": "Circular reference detected"
+}

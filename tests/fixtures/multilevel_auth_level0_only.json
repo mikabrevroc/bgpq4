@@ -1,0 +1,52 @@
+{
+  "name": "auth_level0_only",
+  "description": "AS authorized only at top level",
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-TIER1",
+        "containing_as": 2914,
+        "members": [],
+        "nested_sets": [
+          "AS-TIER2"
+        ],
+        "fallback_mode": "irrFallback",
+        "flags": []
+      }
+    },
+    {
+      "rasa_set": {
+        "as_set_name": "AS-TIER2",
+        "containing_as": 7922,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrFallback",
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64499,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-TIER1"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    }
+  ],
+  "expected_authorizations": {
+    "AS-TIER1": {
+      "64499": "authorized"
+    },
+    "AS-TIER2": {
+      "64499": "not_authorized"
+    }
+  }
+}

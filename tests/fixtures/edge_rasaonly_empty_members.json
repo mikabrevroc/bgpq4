@@ -1,0 +1,18 @@
+{
+  "name": "rasaonly_empty_members",
+  "description": "rasaOnly mode with empty members should fail",
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-INVALID-ONLY",
+        "containing_as": 64496,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "expected_error": "rasaOnly requires members"
+}

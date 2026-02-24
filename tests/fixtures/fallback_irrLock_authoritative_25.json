@@ -1,0 +1,34 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-TEST-25",
+        "containing_as": 64496,
+        "members": [
+          64497,
+          64498
+        ],
+        "nested_sets": [],
+        "fallback_mode": "irrLock",
+        "irr_source": "RADB",
+        "flags": [
+          "authoritative"
+        ]
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": true,
+    "irr_source": "RADB",
+    "expected_members": [],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "fallback_irrLock_authoritative_25",
+    "type": "fallback_mode",
+    "should_succeed": true
+  }
+}

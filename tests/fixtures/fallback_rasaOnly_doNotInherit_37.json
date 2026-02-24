@@ -1,0 +1,37 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-TEST-37",
+        "containing_as": 64496,
+        "members": [
+          64497,
+          64498
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": "RADB",
+        "flags": [
+          "doNotInherit"
+        ]
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": false,
+    "irr_source": null,
+    "expected_members": [
+      64497,
+      64498
+    ],
+    "expand_nested": false,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "fallback_rasaOnly_doNotInherit_37",
+    "type": "fallback_mode",
+    "should_succeed": true
+  }
+}

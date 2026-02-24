@@ -1,0 +1,79 @@
+{
+  "name": "auth_all_levels",
+  "description": "AS authorized at all levels",
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-TIER1",
+        "containing_as": 2914,
+        "members": [],
+        "nested_sets": [
+          "AS-TIER2"
+        ],
+        "fallback_mode": "irrFallback",
+        "flags": []
+      }
+    },
+    {
+      "rasa_set": {
+        "as_set_name": "AS-TIER2",
+        "containing_as": 7922,
+        "members": [],
+        "nested_sets": [
+          "AS-TIER3"
+        ],
+        "fallback_mode": "irrFallback",
+        "flags": []
+      }
+    },
+    {
+      "rasa_set": {
+        "as_set_name": "AS-TIER3",
+        "containing_as": 11039,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrFallback",
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64499,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-TIER1"
+            },
+            "propagation": "unrestricted"
+          },
+          {
+            "entry": {
+              "asset": "AS-TIER2"
+            },
+            "propagation": "unrestricted"
+          },
+          {
+            "entry": {
+              "asset": "AS-TIER3"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    }
+  ],
+  "expected_authorizations": {
+    "AS-TIER1": {
+      "64499": "authorized"
+    },
+    "AS-TIER2": {
+      "64499": "authorized"
+    },
+    "AS-TIER3": {
+      "64499": "authorized"
+    }
+  }
+}
