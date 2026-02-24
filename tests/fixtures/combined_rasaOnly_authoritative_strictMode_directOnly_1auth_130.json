@@ -1,0 +1,49 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-COMBINED-130",
+        "containing_as": 64496,
+        "members": [
+          64497,
+          64498,
+          64499
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": [
+          "authoritative"
+        ]
+      }
+    }
+  ],
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64497,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-COMBINED-130"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": [
+          "strictMode"
+        ]
+      }
+    }
+  ],
+  "expected_behavior": {
+    "set_fallback": "rasaOnly",
+    "auth_flag": "strictMode",
+    "authorized": true
+  },
+  "test_metadata": {
+    "name": "combined_rasaOnly_authoritative_strictMode_directOnly_1auth_130",
+    "type": "combined",
+    "should_succeed": true
+  }
+}

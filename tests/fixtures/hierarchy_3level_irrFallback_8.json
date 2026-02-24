@@ -12,9 +12,7 @@
         ],
         "fallback_mode": "irrFallback",
         "irr_source": null,
-        "flags": [
-          "doNotInherit"
-        ]
+        "flags": []
       }
     },
     {
@@ -45,13 +43,14 @@
         "fallback_mode": "irrFallback",
         "irr_source": null,
         "flags": [
-          "doNotInherit"
+          "doNotInherit",
+          "authoritative"
         ]
       }
     }
   ],
   "rasas": [],
-  "expected_expansion": 1,
+  "expected_expansion": 2,
   "test_metadata": {
     "name": "hierarchy_3level_irrFallback_8",
     "type": "hierarchy",

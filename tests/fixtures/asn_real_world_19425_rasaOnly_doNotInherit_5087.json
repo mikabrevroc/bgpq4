@@ -1,0 +1,38 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-REAL_WORLD-19425-5087",
+        "containing_as": 19425,
+        "members": [
+          19426,
+          19427
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": [
+          "doNotInherit"
+        ]
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": false,
+    "irr_source": null,
+    "expected_members": [
+      19426,
+      19427
+    ],
+    "expand_nested": false,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "asn_real_world_19425_rasaOnly_doNotInherit_5087",
+    "type": "asn_range",
+    "asn_range": "real_world",
+    "should_succeed": true
+  }
+}

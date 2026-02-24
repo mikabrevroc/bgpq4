@@ -1,0 +1,36 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-16BIT_DOCUMENTATION-64511",
+        "containing_as": 64511,
+        "members": [
+          64512,
+          64513
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": false,
+    "irr_source": null,
+    "expected_members": [
+      64512,
+      64513
+    ],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "asn_16bit_documentation_64511_rasaOnly_none_2589",
+    "type": "asn_range",
+    "asn_range": "16bit_documentation",
+    "should_succeed": true
+  }
+}

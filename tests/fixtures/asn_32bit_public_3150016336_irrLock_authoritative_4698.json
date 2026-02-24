@@ -1,0 +1,32 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-32BIT_PUBLIC-3150016336",
+        "containing_as": 3150016336,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrLock",
+        "irr_source": "RADB",
+        "flags": [
+          "authoritative"
+        ]
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": true,
+    "irr_source": "RADB",
+    "expected_members": [],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "asn_32bit_public_3150016336_irrLock_authoritative_4698",
+    "type": "asn_range",
+    "asn_range": "32bit_public",
+    "should_succeed": true
+  }
+}

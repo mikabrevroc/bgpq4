@@ -1,0 +1,41 @@
+{
+  "rasa_sets": [],
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64517,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-0"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64517,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-1"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": []
+      }
+    }
+  ],
+  "expected_authorization": 2,
+  "test_metadata": {
+    "name": "rasa_auth_none_directOnly_2assets_asn64517_322",
+    "type": "rasa_auth",
+    "auth_flag": "none",
+    "propagation": "directOnly",
+    "should_succeed": true
+  }
+}

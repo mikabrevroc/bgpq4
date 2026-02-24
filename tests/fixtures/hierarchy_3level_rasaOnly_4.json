@@ -27,9 +27,7 @@
         ],
         "fallback_mode": "rasaOnly",
         "irr_source": null,
-        "flags": [
-          "doNotInherit"
-        ]
+        "flags": []
       }
     },
     {
@@ -43,13 +41,14 @@
         "fallback_mode": "rasaOnly",
         "irr_source": null,
         "flags": [
-          "doNotInherit"
+          "doNotInherit",
+          "authoritative"
         ]
       }
     }
   ],
   "rasas": [],
-  "expected_expansion": 2,
+  "expected_expansion": 3,
   "test_metadata": {
     "name": "hierarchy_3level_rasaOnly_4",
     "type": "hierarchy",

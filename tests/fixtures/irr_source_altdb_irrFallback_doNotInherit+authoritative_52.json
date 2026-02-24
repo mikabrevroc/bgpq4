@@ -1,0 +1,33 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-IRR-ALTDB-52",
+        "containing_as": 64548,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrFallback",
+        "irr_source": "ALTDB",
+        "flags": [
+          "doNotInherit",
+          "authoritative"
+        ]
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": true,
+    "irr_source": null,
+    "expected_members": [],
+    "expand_nested": false,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "irr_source_altdb_irrFallback_doNotInherit+authoritative_52",
+    "type": "irr_source",
+    "irr_source": "ALTDB",
+    "should_succeed": true
+  }
+}

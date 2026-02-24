@@ -1,0 +1,35 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-BOUNDARY-MAX_32BIT_PRIVATE",
+        "containing_as": 4294967294,
+        "members": [
+          4294967295
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": false,
+    "irr_source": null,
+    "expected_members": [
+      4294967295
+    ],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "boundary_max_32bit_private_rasaOnly_33",
+    "type": "boundary",
+    "boundary_type": "max_32bit_private",
+    "asn": 4294967294,
+    "should_succeed": true
+  }
+}

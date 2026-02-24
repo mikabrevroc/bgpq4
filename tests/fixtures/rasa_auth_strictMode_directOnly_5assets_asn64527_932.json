@@ -1,0 +1,93 @@
+{
+  "rasa_sets": [],
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64527,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-0"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": [
+          "strictMode"
+        ]
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64527,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-1"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": [
+          "strictMode"
+        ]
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64527,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-2"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": [
+          "strictMode"
+        ]
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64527,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-3"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": [
+          "strictMode"
+        ]
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64527,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-4"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": [
+          "strictMode"
+        ]
+      }
+    }
+  ],
+  "expected_authorization": 5,
+  "test_metadata": {
+    "name": "rasa_auth_strictMode_directOnly_5assets_asn64527_932",
+    "type": "rasa_auth",
+    "auth_flag": "strictMode",
+    "propagation": "directOnly",
+    "should_succeed": true
+  }
+}

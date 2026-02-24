@@ -1,0 +1,30 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-IRR-JPIRR-85",
+        "containing_as": 64581,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrLock",
+        "irr_source": "JPIRR",
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": true,
+    "irr_source": "JPIRR",
+    "expected_members": [],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "irr_source_jpirr_irrLock_none_85",
+    "type": "irr_source",
+    "irr_source": "JPIRR",
+    "should_succeed": true
+  }
+}

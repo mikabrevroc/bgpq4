@@ -1,0 +1,30 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-IRR-TC-93",
+        "containing_as": 64589,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrLock",
+        "irr_source": "TC",
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": true,
+    "irr_source": "TC",
+    "expected_members": [],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "irr_source_tc_irrLock_none_93",
+    "type": "irr_source",
+    "irr_source": "TC",
+    "should_succeed": true
+  }
+}

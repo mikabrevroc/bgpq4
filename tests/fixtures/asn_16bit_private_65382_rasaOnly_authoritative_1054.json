@@ -1,0 +1,38 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-16BIT_PRIVATE-65382",
+        "containing_as": 65382,
+        "members": [
+          65383,
+          65384
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": [
+          "authoritative"
+        ]
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": false,
+    "irr_source": null,
+    "expected_members": [
+      65383,
+      65384
+    ],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "asn_16bit_private_65382_rasaOnly_authoritative_1054",
+    "type": "asn_range",
+    "asn_range": "16bit_private",
+    "should_succeed": true
+  }
+}

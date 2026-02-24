@@ -1,0 +1,35 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-BOUNDARY-RESERVED",
+        "containing_as": 65535,
+        "members": [
+          65536
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": false,
+    "irr_source": null,
+    "expected_members": [
+      65536
+    ],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "boundary_reserved_rasaOnly_21",
+    "type": "boundary",
+    "boundary_type": "reserved",
+    "asn": 65535,
+    "should_succeed": true
+  }
+}

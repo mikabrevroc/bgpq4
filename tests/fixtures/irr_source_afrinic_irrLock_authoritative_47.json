@@ -1,0 +1,32 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-IRR-AFRINIC-47",
+        "containing_as": 64543,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrLock",
+        "irr_source": "AFRINIC",
+        "flags": [
+          "authoritative"
+        ]
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": true,
+    "irr_source": "AFRINIC",
+    "expected_members": [],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "irr_source_afrinic_irrLock_authoritative_47",
+    "type": "irr_source",
+    "irr_source": "AFRINIC",
+    "should_succeed": true
+  }
+}

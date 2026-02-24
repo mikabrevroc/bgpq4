@@ -1,0 +1,31 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-BOUNDARY-RESERVED",
+        "containing_as": 65535,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrFallback",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": true,
+    "irr_source": null,
+    "expected_members": [],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "boundary_reserved_irrFallback_19",
+    "type": "boundary",
+    "boundary_type": "reserved",
+    "asn": 65535,
+    "should_succeed": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-NO_IRRSOURCE_IRRLOCK",
+        "containing_as": 64496,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrLock",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_error": "Invalid configuration: no_irrsource_irrlock",
+  "test_metadata": {
+    "name": "invalid_no_irrsource_irrlock_35",
+    "type": "invalid",
+    "should_succeed": false
+  }
+}

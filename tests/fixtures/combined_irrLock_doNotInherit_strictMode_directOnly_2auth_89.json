@@ -1,0 +1,65 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-COMBINED-89",
+        "containing_as": 64496,
+        "members": [
+          64497,
+          64498,
+          64499
+        ],
+        "nested_sets": [],
+        "fallback_mode": "irrLock",
+        "irr_source": "RADB",
+        "flags": [
+          "doNotInherit"
+        ]
+      }
+    }
+  ],
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64497,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-COMBINED-89"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": [
+          "strictMode"
+        ]
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64497,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-COMBINED-89"
+            },
+            "propagation": "directOnly"
+          }
+        ],
+        "flags": [
+          "strictMode"
+        ]
+      }
+    }
+  ],
+  "expected_behavior": {
+    "set_fallback": "irrLock",
+    "auth_flag": "strictMode",
+    "authorized": true
+  },
+  "test_metadata": {
+    "name": "combined_irrLock_doNotInherit_strictMode_directOnly_2auth_89",
+    "type": "combined",
+    "should_succeed": true
+  }
+}

@@ -19,12 +19,22 @@ class FixtureGenerator:
         counts = {
             'fallback_mode': 0,
             'hierarchy': 0,
+            'asn_range': 0,
+            'irr_source': 0,
+            'rasa_auth': 0,
+            'combined': 0,
+            'boundary': 0,
             'edge_cases': 0,
             'total': 0
         }
         
         counts['fallback_mode'] = self._generate_fallback_mode_fixtures()
         counts['hierarchy'] = self._generate_hierarchy_fixtures()
+        counts['asn_range'] = self._generate_asn_range_fixtures()
+        counts['irr_source'] = self._generate_irr_source_fixtures()
+        counts['rasa_auth'] = self._generate_rasa_auth_fixtures()
+        counts['combined'] = self._generate_combined_fixtures()
+        counts['boundary'] = self._generate_boundary_fixtures()
         counts['edge_cases'] = self._generate_edge_case_fixtures()
         counts['total'] = sum(counts.values())
         
@@ -66,7 +76,7 @@ class FixtureGenerator:
     def _generate_hierarchy_fixtures(self) -> int:
         count = 0
         
-        for levels in [2, 3]:
+        for levels in [1, 2, 3, 4, 5]:
             for fallback_mode in FallbackMode:
                 for test in self.engine.generate_hierarchy_tests(levels, fallback_mode):
                     rasa_sets = []
@@ -98,6 +108,229 @@ class FixtureGenerator:
                     filename = f"{test['name']}.json"
                     self._write_fixture(filename, fixture)
                     count += 1
+        
+        return count
+    
+    def _generate_asn_range_fixtures(self) -> int:
+        count = 0
+        
+        for test in self.engine.generate_asn_range_tests():
+            fixture = {
+                'rasa_sets': [
+                    {
+                        'rasa_set': {
+                            'as_set_name': test['config'].as_set_name,
+                            'containing_as': test['config'].containing_as,
+                            'members': test['config'].members,
+                            'nested_sets': test['config'].nested_sets,
+                            'fallback_mode': test['config'].fallback_mode.value,
+                            'irr_source': test['config'].irr_source,
+                            'flags': test['config'].flags.value.split('+') if '+' in test['config'].flags.value else [test['config'].flags.value] if test['config'].flags.value != 'none' else []
+                        }
+                    }
+                ],
+                'rasas': [],
+                'expected_behavior': test['expected'],
+                'test_metadata': {
+                    'name': test['name'],
+                    'type': test['type'],
+                    'asn_range': test.get('asn_range'),
+                    'should_succeed': test['should_succeed']
+                }
+            }
+            
+            filename = f"{test['name']}.json"
+            self._write_fixture(filename, fixture)
+            count += 1
+        
+        return count
+    
+    def _generate_irr_source_fixtures(self) -> int:
+        count = 0
+        
+        for test in self.engine.generate_irr_source_tests():
+            fixture = {
+                'rasa_sets': [
+                    {
+                        'rasa_set': {
+                            'as_set_name': test['config'].as_set_name,
+                            'containing_as': test['config'].containing_as,
+                            'members': test['config'].members,
+                            'nested_sets': test['config'].nested_sets,
+                            'fallback_mode': test['config'].fallback_mode.value,
+                            'irr_source': test['config'].irr_source,
+                            'flags': test['config'].flags.value.split('+') if '+' in test['config'].flags.value else [test['config'].flags.value] if test['config'].flags.value != 'none' else []
+                        }
+                    }
+                ],
+                'rasas': [],
+                'expected_behavior': test['expected'],
+                'test_metadata': {
+                    'name': test['name'],
+                    'type': test['type'],
+                    'irr_source': test.get('irr_source'),
+                    'should_succeed': test['should_succeed']
+                }
+            }
+            
+            filename = f"{test['name']}.json"
+            self._write_fixture(filename, fixture)
+            count += 1
+        
+        return count
+    
+    def _generate_rasa_auth_fixtures(self) -> int:
+        count = 0
+        
+        for test in self.engine.generate_rasa_auth_tests():
+            auth_cfg = test['auth_config']
+            rasas = []
+            for entry in auth_cfg.authorized_in:
+                rasas.append({
+                    'rasa': {
+                        'authorized_as': auth_cfg.authorized_as,
+                        'authorized_in': [
+                            {
+                                'entry': {
+                                    'asset': entry.as_set_name
+                                },
+                                'propagation': entry.propagation.value
+                            }
+                        ],
+                        'flags': [auth_cfg.flags.value] if auth_cfg.flags.value != 'none' else []
+                    }
+                })
+            
+            fixture = {
+                'rasa_sets': [],
+                'rasas': rasas,
+                'expected_authorization': test['expected_authorized'],
+                'test_metadata': {
+                    'name': test['name'],
+                    'type': test['type'],
+                    'auth_flag': test.get('auth_flag'),
+                    'propagation': test.get('propagation'),
+                    'should_succeed': test['should_succeed']
+                }
+            }
+            
+            filename = f"{test['name']}.json"
+            self._write_fixture(filename, fixture)
+            count += 1
+        
+        return count
+    
+    def _generate_combined_fixtures(self) -> int:
+        count = 0
+        
+        for test in self.engine.generate_combined_tests():
+            set_cfg = test['set_config']
+            auth_cfg = test['auth_config']
+            
+            rasa_sets = [{
+                'rasa_set': {
+                    'as_set_name': set_cfg.as_set_name,
+                    'containing_as': set_cfg.containing_as,
+                    'members': set_cfg.members,
+                    'nested_sets': set_cfg.nested_sets,
+                    'fallback_mode': set_cfg.fallback_mode.value,
+                    'irr_source': set_cfg.irr_source,
+                    'flags': set_cfg.flags.value.split('+') if '+' in set_cfg.flags.value else [set_cfg.flags.value] if set_cfg.flags.value != 'none' else []
+                }
+            }]
+            
+            rasas = []
+            for entry in auth_cfg.authorized_in:
+                rasas.append({
+                    'rasa': {
+                        'authorized_as': auth_cfg.authorized_as,
+                        'authorized_in': [
+                            {
+                                'entry': {
+                                    'asset': entry.as_set_name
+                                },
+                                'propagation': entry.propagation.value
+                            }
+                        ],
+                        'flags': [auth_cfg.flags.value] if auth_cfg.flags.value != 'none' else []
+                    }
+                })
+            
+            fixture = {
+                'rasa_sets': rasa_sets,
+                'rasas': rasas,
+                'expected_behavior': {
+                    'set_fallback': set_cfg.fallback_mode.value,
+                    'auth_flag': auth_cfg.flags.value,
+                    'authorized': True
+                },
+                'test_metadata': {
+                    'name': test['name'],
+                    'type': test['type'],
+                    'should_succeed': test['should_succeed']
+                }
+            }
+            
+            filename = f"{test['name']}.json"
+            self._write_fixture(filename, fixture)
+            count += 1
+        
+        return count
+    
+    def _generate_boundary_fixtures(self) -> int:
+        count = 0
+        
+        for test in self.engine.generate_boundary_tests():
+            if test['type'] == 'invalid':
+                fixture = {
+                    'rasa_sets': [{
+                        'rasa_set': {
+                            'as_set_name': f"AS-{test['config']['name'].upper()}",
+                            'containing_as': test['config'].get('containing_as', 64496),
+                            'members': test['config'].get('members', []),
+                            'nested_sets': [],
+                            'fallback_mode': test['config']['fallback_mode'].value,
+                            'irr_source': test['config'].get('irr_source'),
+                            'flags': []
+                        }
+                    }],
+                    'rasas': [],
+                    'expected_error': test['expected_error'],
+                    'test_metadata': {
+                        'name': test['name'],
+                        'type': test['type'],
+                        'should_succeed': test['should_succeed']
+                    }
+                }
+            else:
+                fixture = {
+                    'rasa_sets': [
+                        {
+                            'rasa_set': {
+                                'as_set_name': test['config'].as_set_name,
+                                'containing_as': test['config'].containing_as,
+                                'members': test['config'].members,
+                                'nested_sets': test['config'].nested_sets,
+                                'fallback_mode': test['config'].fallback_mode.value,
+                                'irr_source': test['config'].irr_source,
+                                'flags': test['config'].flags.value.split('+') if '+' in test['config'].flags.value else [test['config'].flags.value] if test['config'].flags.value != 'none' else []
+                            }
+                        }
+                    ],
+                    'rasas': [],
+                    'expected_behavior': test['expected'],
+                    'test_metadata': {
+                        'name': test['name'],
+                        'type': test['type'],
+                        'boundary_type': test.get('boundary_type'),
+                        'asn': test.get('asn'),
+                        'should_succeed': test['should_succeed']
+                    }
+                }
+            
+            filename = f"{test['name']}.json"
+            self._write_fixture(filename, fixture)
+            count += 1
         
         return count
     
@@ -381,17 +614,25 @@ def main():
                        help='Output directory for fixtures')
     parser.add_argument('--count', action='store_true',
                        help='Count fixtures and exit')
+    parser.add_argument('--limit', type=int, default=None,
+                       help='Limit number of fixtures per category')
     args = parser.parse_args()
     
     generator = FixtureGenerator(args.output)
     
     if args.count:
-        counts = generator.count_valid_combinations()
+        counts = generator.engine.count_valid_combinations()
         print(f"Estimated fixture count:")
-        print(f"  Fallback mode: {counts['fallback_mode']}")
-        print(f"  Hierarchy: {counts['hierarchy']}")
+        print(f"  Fallback mode: {counts['fallback_mode_tests']}")
+        print(f"  Hierarchy: {counts['hierarchy_tests']}")
+        print(f"  ASN ranges: {counts['asn_range_tests']}")
+        print(f"  IRR sources: {counts['irr_source_tests']}")
+        print(f"  RASA-AUTH: {counts['rasa_auth_tests']}")
+        print(f"  Combined: {counts['combined_tests']}")
+        print(f"  Boundary: {counts['boundary_tests']}")
         print(f"  Edge cases: 5+")
         print(f"  Multi-level auth: 3+")
+        print(f"  TOTAL: {counts['total']}")
         return
     
     print("Generating RASA test fixtures...")
@@ -404,6 +645,11 @@ def main():
     print(f"\nGenerated {counts['total']} fixtures:")
     print(f"  Fallback mode: {counts['fallback_mode']}")
     print(f"  Hierarchy: {counts['hierarchy']}")
+    print(f"  ASN ranges: {counts.get('asn_range', 0)}")
+    print(f"  IRR sources: {counts.get('irr_source', 0)}")
+    print(f"  RASA-AUTH: {counts.get('rasa_auth', 0)}")
+    print(f"  Combined: {counts.get('combined', 0)}")
+    print(f"  Boundary: {counts.get('boundary', 0)}")
     print(f"  Edge cases: {counts['edge_cases']}")
     print(f"  Multi-level auth: {auth_count}")
     print(f"\nOutput directory: {args.output}")

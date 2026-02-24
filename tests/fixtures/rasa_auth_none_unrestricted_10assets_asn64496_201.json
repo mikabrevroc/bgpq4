@@ -1,0 +1,153 @@
+{
+  "rasa_sets": [],
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-0"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-1"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-2"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-3"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-4"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-5"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-6"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-7"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-8"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    },
+    {
+      "rasa": {
+        "authorized_as": 64496,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-9"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    }
+  ],
+  "expected_authorization": 10,
+  "test_metadata": {
+    "name": "rasa_auth_none_unrestricted_10assets_asn64496_201",
+    "type": "rasa_auth",
+    "auth_flag": "none",
+    "propagation": "unrestricted",
+    "should_succeed": true
+  }
+}

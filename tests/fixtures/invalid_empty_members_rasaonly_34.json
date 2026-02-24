@@ -1,0 +1,22 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-EMPTY_MEMBERS_RASAONLY",
+        "containing_as": 64496,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_error": "Invalid configuration: empty_members_rasaonly",
+  "test_metadata": {
+    "name": "invalid_empty_members_rasaonly_34",
+    "type": "invalid",
+    "should_succeed": false
+  }
+}

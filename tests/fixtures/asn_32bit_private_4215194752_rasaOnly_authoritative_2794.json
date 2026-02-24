@@ -1,0 +1,38 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-32BIT_PRIVATE-4215194752",
+        "containing_as": 4215194752,
+        "members": [
+          4215194753,
+          4215194754
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": [
+          "authoritative"
+        ]
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": false,
+    "irr_source": null,
+    "expected_members": [
+      4215194753,
+      4215194754
+    ],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "asn_32bit_private_4215194752_rasaOnly_authoritative_2794",
+    "type": "asn_range",
+    "asn_range": "32bit_private",
+    "should_succeed": true
+  }
+}

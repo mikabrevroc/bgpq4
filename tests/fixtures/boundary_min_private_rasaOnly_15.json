@@ -1,0 +1,35 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-BOUNDARY-MIN_PRIVATE",
+        "containing_as": 64512,
+        "members": [
+          64513
+        ],
+        "nested_sets": [],
+        "fallback_mode": "rasaOnly",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": false,
+    "irr_source": null,
+    "expected_members": [
+      64513
+    ],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "boundary_min_private_rasaOnly_15",
+    "type": "boundary",
+    "boundary_type": "min_private",
+    "asn": 64512,
+    "should_succeed": true
+  }
+}

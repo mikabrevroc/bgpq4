@@ -1,0 +1,31 @@
+{
+  "rasa_sets": [
+    {
+      "rasa_set": {
+        "as_set_name": "AS-BOUNDARY-MAX_32BIT_PUBLIC",
+        "containing_as": 4199999999,
+        "members": [],
+        "nested_sets": [],
+        "fallback_mode": "irrFallback",
+        "irr_source": null,
+        "flags": []
+      }
+    }
+  ],
+  "rasas": [],
+  "expected_behavior": {
+    "should_query_irr": true,
+    "irr_source": null,
+    "expected_members": [],
+    "expand_nested": true,
+    "warnings": [],
+    "errors": []
+  },
+  "test_metadata": {
+    "name": "boundary_max_32bit_public_irrFallback_25",
+    "type": "boundary",
+    "boundary_type": "max_32bit_public",
+    "asn": 4199999999,
+    "should_succeed": true
+  }
+}

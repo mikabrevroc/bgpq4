@@ -12,9 +12,7 @@
         ],
         "fallback_mode": "irrFallback",
         "irr_source": null,
-        "flags": [
-          "doNotInherit"
-        ]
+        "flags": []
       }
     },
     {
@@ -44,12 +42,14 @@
         "nested_sets": [],
         "fallback_mode": "irrFallback",
         "irr_source": null,
-        "flags": []
+        "flags": [
+          "authoritative"
+        ]
       }
     }
   ],
   "rasas": [],
-  "expected_expansion": 1,
+  "expected_expansion": 2,
   "test_metadata": {
     "name": "hierarchy_3level_irrFallback_7",
     "type": "hierarchy",

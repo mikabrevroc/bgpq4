@@ -1,0 +1,27 @@
+{
+  "rasa_sets": [],
+  "rasas": [
+    {
+      "rasa": {
+        "authorized_as": 64507,
+        "authorized_in": [
+          {
+            "entry": {
+              "asset": "AS-AUTH-0"
+            },
+            "propagation": "unrestricted"
+          }
+        ],
+        "flags": []
+      }
+    }
+  ],
+  "expected_authorization": 1,
+  "test_metadata": {
+    "name": "rasa_auth_none_unrestricted_1assets_asn64507_12",
+    "type": "rasa_auth",
+    "auth_flag": "none",
+    "propagation": "unrestricted",
+    "should_succeed": true
+  }
+}
