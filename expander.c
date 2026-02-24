@@ -335,6 +335,30 @@ bgpq_expand_irrd(struct bgpq_expander *b,
     int (*callback)(char*, struct bgpq_expander *b, struct request *req),
     void *udata, char *fmt, ...);
 
+/*
+ * Check if RASA-SET exists for an AS-SET and return fallback mode
+ * Returns: -1 = no RASA-SET, 0 = irrFallback, 1 = irrLock, 2 = rasaOnly
+ */
+#ifdef HAVE_JANSSON
+static int
+check_rasa_set_mode(struct bgpq_expander *b, const char *asset)
+{
+	struct rasa_set_membership result;
+	int ret;
+
+	if (!b->rasa_set || !b->rasa_set->enabled)
+		return -1;
+
+	/* Check if we have a RASA-SET for this asset */
+	ret = rasa_check_set_membership(asset, 0, &result);
+	if (ret != 0 || !result.reason ||
+	    strcmp(result.reason, "no RASA-SET for this AS-SET (default allow)") == 0)
+		return -1;
+
+	return b->rasa_set->fallback_mode;
+}
+#endif
+
 static int
 bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
     struct request *req)
@@ -366,6 +390,33 @@ bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
 			/* Save current asset context and set new one for nested expansion */
 			prev_asset = b->current_asset;
 			b->current_asset = strdup(as);
+
+			/* Check RASA-SET for this AS-SET */
+			int rasa_mode = check_rasa_set_mode(b, as);
+			
+			/* If irrLock mode, override source to locked IRR database */
+			if (rasa_mode == RASA_FALLBACK_MODE_IRR_LOCK && b->rasa_set->irr_source) {
+				SX_DEBUG(debug_expander, "RASA-SET: %s locked to %s\n",
+				    as, b->rasa_set->irr_source);
+				source = strdup(b->rasa_set->irr_source);
+				/* Force source selection */
+				if (pipelining) {
+					bgpq_pipeline(b, NULL, NULL, "!s%s\n", source);
+				} else {
+					bgpq_expand_irrd(b, NULL, NULL, "!s%s\n", source);
+				}
+				free(source);
+			}
+			/* If rasaOnly mode, skip IRR query entirely */
+			else if (rasa_mode == RASA_FALLBACK_MODE_RASA_ONLY) {
+				SX_DEBUG(debug_expander, "RASA-SET: %s in rasaOnly mode, skipping IRR\n", as);
+				/* Restore previous asset context */
+				free(b->current_asset);
+				b->current_asset = prev_asset;
+				return 0;
+			}
+			/* irrFallback or no RASA-SET: proceed with normal IRR query */
+			else {
 #endif
 			if (pipelining) {
 				if (b->usesource) {
@@ -404,6 +455,7 @@ bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
 			/* Restore previous asset context */
 			free(b->current_asset);
 			b->current_asset = prev_asset;
+			}
 #endif
 		} else {
 			SX_DEBUG(debug_expander > 2, "ignoring %s at depth %i\n",
@@ -1494,6 +1546,16 @@ expander_freeall(struct bgpq_expander *expander)
 	sx_radix_tree_freeall(expander->tree);
 
 #ifdef HAVE_JANSSON
+	if (expander->rasa) {
+		rasa_free_config(expander->rasa);
+		free(expander->rasa);
+		expander->rasa = NULL;
+	}
+	if (expander->rasa_set) {
+		rasa_set_free_config(expander->rasa_set);
+		free(expander->rasa_set);
+		expander->rasa_set = NULL;
+	}
 	if (expander->current_asset) {
 		free(expander->current_asset);
 		expander->current_asset = NULL;

@@ -143,6 +143,8 @@ int
 rasa_set_load_config(struct rasa_set_config *cfg, const char *filename)
 {
 	json_error_t error;
+	json_t *rasasets, *set_entry, *set_obj;
+	size_t i;
 
 	if (!filename)
 		return -1;
@@ -151,6 +153,58 @@ rasa_set_load_config(struct rasa_set_config *cfg, const char *filename)
 	if (!rasa_set_data) {
 		return -1;
 	}
+
+	/* Parse first RASA-SET to extract config fields */
+	rasasets = json_object_get(rasa_set_data, "rasa_sets");
+	if (rasasets && json_is_array(rasasets) && json_array_size(rasasets) > 0) {
+		set_entry = json_array_get(rasasets, 0);
+		if (set_entry) {
+			set_obj = json_object_get(set_entry, "rasa_set");
+			if (set_obj) {
+				/* Parse fallback_mode */
+				json_t *fallback_mode = json_object_get(set_obj, "fallback_mode");
+				if (fallback_mode && json_is_string(fallback_mode)) {
+					const char *mode = json_string_value(fallback_mode);
+					if (strcmp(mode, "irrLock") == 0)
+						cfg->fallback_mode = RASA_FALLBACK_MODE_IRR_LOCK;
+					else if (strcmp(mode, "rasaOnly") == 0)
+						cfg->fallback_mode = RASA_FALLBACK_MODE_RASA_ONLY;
+					else
+						cfg->fallback_mode = RASA_FALLBACK_MODE_IRR_FALLBACK;
+				} else {
+					cfg->fallback_mode = RASA_FALLBACK_MODE_IRR_FALLBACK;
+				}
+
+				/* Parse irr_source */
+				json_t *irr_source = json_object_get(set_obj, "irr_source");
+				if (irr_source && json_is_string(irr_source)) {
+					cfg->irr_source = strdup(json_string_value(irr_source));
+				}
+
+				/* Parse containing_as */
+				json_t *containing_as = json_object_get(set_obj, "containing_as");
+				if (containing_as && json_is_integer(containing_as)) {
+					cfg->containing_as = (uint32_t)json_integer_value(containing_as);
+				}
+
+				/* Parse nested_sets */
+				json_t *nested_sets = json_object_get(set_obj, "nested_sets");
+				if (nested_sets && json_is_array(nested_sets)) {
+					cfg->num_nested = json_array_size(nested_sets);
+					if (cfg->num_nested > 0) {
+						cfg->nested_sets = calloc(cfg->num_nested, sizeof(char *));
+						for (i = 0; i < cfg->num_nested; i++) {
+							json_t *nested = json_array_get(nested_sets, i);
+							if (nested && json_is_string(nested)) {
+								cfg->nested_sets[i] = strdup(json_string_value(nested));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	cfg->enabled = 1;
 	cfg->source_file = strdup(filename);
 	return 0;
@@ -235,15 +289,31 @@ rasa_check_set_membership(const char *asset, uint32_t asn,
 void
 rasa_set_free_config(struct rasa_set_config *cfg)
 {
+	size_t i;
+
 	if (cfg->source_file) {
 		free(cfg->source_file);
 		cfg->source_file = NULL;
+	}
+	if (cfg->irr_source) {
+		free(cfg->irr_source);
+		cfg->irr_source = NULL;
+	}
+	if (cfg->nested_sets) {
+		for (i = 0; i < cfg->num_nested; i++) {
+			if (cfg->nested_sets[i])
+				free(cfg->nested_sets[i]);
+		}
+		free(cfg->nested_sets);
+		cfg->nested_sets = NULL;
+		cfg->num_nested = 0;
 	}
 	if (rasa_set_data) {
 		json_decref(rasa_set_data);
 		rasa_set_data = NULL;
 	}
 	cfg->enabled = 0;
+	cfg->fallback_mode = RASA_FALLBACK_MODE_IRR_FALLBACK;
 }
 
 /*

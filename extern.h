@@ -123,6 +123,7 @@ struct bgpq_expander {
 	RB_HEAD(tentree, sx_tentry)	 already, stoplist;
 #ifdef HAVE_JANSSON
 	struct rasa_config	*rasa;
+	struct rasa_set_config	*rasa_set;
 	char			*current_asset;
 #endif
 };
