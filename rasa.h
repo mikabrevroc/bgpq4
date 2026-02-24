@@ -65,3 +65,11 @@ int rasa_verify_bidirectional(const char *asset, uint32_t asn,
     struct rasa_auth *auth_result, struct rasa_set_membership *set_result);
 
 #endif
+
+
+/* New hash table based API for per-AS-SET lookup */
+struct rasa_set_entry;
+int rasa_load_sets_from_json(const char *filename);
+struct rasa_set_entry *rasa_lookup_set(const char *as_set_name);
+void rasa_cleanup_sets(void);
+int rasa_set_count(void);
