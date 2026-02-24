@@ -22,7 +22,8 @@ bgpq4_SOURCES=main.c extern.h printer.c expander.c rasa.c rasa.h rasa_hash.c ras
     sx_slentry.c
 
 check_PROGRAMS = test_rasa test_rasa_integration test_rasa_minimal \
-    test_rasa_auth test_rasa_set test_rasa_bidirectional test_rasa_bidirectional2 test_rasa_edge
+    test_rasa_auth test_rasa_set test_rasa_bidirectional test_rasa_bidirectional2 test_rasa_edge \
+    test_rasa_realworld
 
 test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_LDADD = $(JANSSON_LIBS)
@@ -47,6 +48,9 @@ test_rasa_bidirectional2_LDADD = $(JANSSON_LIBS)
 
 test_rasa_edge_SOURCES = tests/test_rasa_edge.c rasa.c rasa.h rasa_hash.c rasa_hash.h
 test_rasa_edge_LDADD = $(JANSSON_LIBS)
+
+test_rasa_realworld_SOURCES = tests/test_rasa_realworld.c rasa.c rasa.h rasa_hash.c rasa_hash.h
+test_rasa_realworld_LDADD = $(JANSSON_LIBS)
 
 EXTRA_DIST=bootstrap README.md CHANGES
 
