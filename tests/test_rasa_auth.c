@@ -453,7 +453,7 @@ static void test_rasa_auth_free_null_config(void) {
 static void test_rasa_auth_many_asns(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
-    char *json = malloc(4096);
+    char *json = malloc(16384);
     ASSERT(json);
     strcpy(json, "{\"rasas\":[");
     for (int i = 0; i < 100; i++) {
@@ -480,7 +480,7 @@ static void test_rasa_auth_many_asns(void) {
 static void test_rasa_auth_many_assets(void) {
     struct rasa_config cfg = {0};
     struct rasa_auth result = {0};
-    char *json = malloc(8192);
+    char *json = malloc(32768);
     ASSERT(json);
     strcpy(json, "{\"rasas\":[{\"rasa\":{\"authorized_as\":64496,\"authorized_in\":[");
     for (int i = 0; i < 100; i++) {

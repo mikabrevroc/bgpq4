@@ -59,6 +59,12 @@ rasa_check_auth(uint32_t asn, const char *asset, struct rasa_auth *result)
 		return 0;
 	}
 
+	if (json_array_size(rasas) == 0) {
+		result->authorized = 1;
+		result->reason = "empty RASA config (default allow)";
+		return 0;
+	}
+
 	for (i = 0; i < json_array_size(rasas); i++) {
 		rasa_entry = json_array_get(rasas, i);
 		if (!rasa_entry)
@@ -191,7 +197,7 @@ rasa_check_set_membership(const char *asset, uint32_t asn,
 			continue;
 
 		const char *set_name = json_string_value(name_obj);
-		if (strcmp(set_name, asset) != 0)
+		if (!asset || strcmp(set_name, asset) != 0)
 			continue;
 
 		members = json_object_get(set_obj, "members");
