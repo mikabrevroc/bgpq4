@@ -10,12 +10,15 @@
 # Generated files
 .deps/
 .libs/
-Makefile
-Makefile.in
+**/Makefile
+!**/Makefile.am
+**/Makefile.in
 stamp-h1
 config.h
 config.h.in
 config.log
+config.guess
+config.sub
 config.status
 configure
 configure.ac
@@ -62,6 +65,7 @@ desktop.ini
 # Test artifacts
 tests/*.o
 tests/.deps/
+**/.dirstamp
 *.trs
 *.log
 test-suite.log

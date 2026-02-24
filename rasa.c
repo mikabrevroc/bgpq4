@@ -1,6 +1,27 @@
 /*
- * Copyright (c) 2025 RASA Project
+ * Copyright (c) 2025 Mikael Abrahamsson <mikael.abrahamsson@fitaliv.se>
  * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  *
  * RASA (RPKI AS-SET Authorization) implementation
  * Minimal implementation - reads JSON output from rpki-client
@@ -29,7 +50,8 @@ rasa_load_config(struct rasa_config *cfg, const char *filename)
 		return -1;
 	}
 	cfg->enabled = 1;
-	cfg->source_file = strdup(filename);
+	if ((cfg->source_file = strdup(filename)) == NULL)
+		return -1;
 	return 0;
 }
 
@@ -179,7 +201,10 @@ rasa_set_load_config(struct rasa_set_config *cfg, const char *filename)
 				/* Parse irr_source */
 				json_t *irr_source = json_object_get(set_obj, "irr_source");
 				if (irr_source && json_is_string(irr_source)) {
-					cfg->irr_source = strdup(json_string_value(irr_source));
+					if ((cfg->irr_source = strdup(json_string_value(irr_source))) == NULL) {
+						rasa_free_config((struct rasa_config *)cfg);
+						return -1;
+					}
 				}
 
 				/* Parse containing_as */
@@ -197,7 +222,17 @@ rasa_set_load_config(struct rasa_set_config *cfg, const char *filename)
 						for (i = 0; i < cfg->num_nested; i++) {
 							json_t *nested = json_array_get(nested_sets, i);
 							if (nested && json_is_string(nested)) {
-								cfg->nested_sets[i] = strdup(json_string_value(nested));
+								if ((cfg->nested_sets[i] = strdup(json_string_value(nested))) == NULL) {
+								/* Cleanup on allocation failure */
+								while (i > 0) {
+									i--;
+									free(cfg->nested_sets[i]);
+								}
+								free(cfg->nested_sets);
+								cfg->nested_sets = NULL;
+								rasa_free_config((struct rasa_config *)cfg);
+								return -1;
+							}
 							}
 						}
 					}
@@ -207,7 +242,8 @@ rasa_set_load_config(struct rasa_set_config *cfg, const char *filename)
 	}
 
 	cfg->enabled = 1;
-	cfg->source_file = strdup(filename);
+	if ((cfg->source_file = strdup(filename)) == NULL)
+		return -1;
 	return 0;
 }
 
@@ -398,6 +434,10 @@ rasa_load_sets_from_json(const char *filename)
             continue;
         
         new_entry->as_set_name = strdup(json_string_value(name_obj));
+		if (!new_entry->as_set_name) {
+			free(new_entry);
+			continue;
+		}
         
         mode_obj = json_object_get(rasa_set_obj, "fallback_mode");
         if (json_is_string(mode_obj)) {
@@ -413,7 +453,11 @@ rasa_load_sets_from_json(const char *filename)
         
         source_obj = json_object_get(rasa_set_obj, "irr_source");
         if (json_is_string(source_obj))
-            new_entry->irr_source = strdup(json_string_value(source_obj));
+            if ((new_entry->irr_source = strdup(json_string_value(source_obj))) == NULL) {
+			free(new_entry->as_set_name);
+			free(new_entry);
+			continue;
+		}
         
         members_obj = json_object_get(rasa_set_obj, "members");
         if (json_is_array(members_obj)) {
@@ -436,7 +480,19 @@ rasa_load_sets_from_json(const char *filename)
                 for (j = 0; j < new_entry->num_nested; j++) {
                     json_t *nested = json_array_get(nested_obj, j);
                     if (json_is_string(nested))
-                        new_entry->nested_sets[j] = strdup(json_string_value(nested));
+                        if ((new_entry->nested_sets[j] = strdup(json_string_value(nested))) == NULL) {
+						/* Cleanup on allocation failure */
+						while (j > 0) {
+							j--;
+							free(new_entry->nested_sets[j]);
+						}
+						free(new_entry->nested_sets);
+						free(new_entry->irr_source);
+						free(new_entry->as_set_name);
+						free(new_entry);
+						new_entry = NULL;
+						break;
+					}
                 }
             }
         }
