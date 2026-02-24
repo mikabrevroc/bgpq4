@@ -1,35 +1,70 @@
 # RASA Test Fixtures
 
-This directory contains mock JSON files for testing RASA (RPKI AS-SET Authorization) functionality.
+This directory contains JSON test fixtures for RASA (RPKI AS-SET Authorization) functionality.
+
+**IMPORTANT**: The full set of 6,787 fixtures is NOT stored in git. They are generated at build time.
 
 ## Directory Structure
 
 ```
 fixtures/
-├── rasa-auth/          # RASA-AUTH test files
-│   ├── valid/          # Valid RASA-AUTH configurations
-│   ├── invalid/        # Invalid/malformed files
-│   └── edge-cases/     # Edge case scenarios
-├── rasa-set/           # RASA-SET test files
-│   ├── valid/          # Valid RASA-SET configurations
-│   ├── invalid/        # Invalid/malformed files
-│   └── edge-cases/     # Edge case scenarios
-└── bidirectional/      # Combined test scenarios
-    ├── both-auth/      # Both RASA-AUTH and RASA-SET present
-    ├── single-auth/    # Only one type present
-    └── conflicts/      # Conflicting authorizations
+├── sample/                    # Representative examples (stored in git)
+│   ├── fallback_irrFallback_none_1.json
+│   ├── hierarchy_2level_irrFallback_1.json
+│   ├── edge_hurricane_electric_pattern.json
+│   ├── edge_google_rasaonly_pattern.json
+│   └── boundary_max_16bit_public_irrFallback_4.json
+├── *.json                     # Generated fixtures (NOT in git)
+└── README.md                  # This file
+```
 
-## File Naming Convention
+## Generating Fixtures
 
-- `{test-case-id}-{description}.json`
-- Examples:
-  - `001-single-as.json`
-  - `002-multiple-assets.json`
-  - `003-empty-members.json`
+### Full Set (6,787 fixtures)
 
-## Test Coverage Goals
+```bash
+make fixtures
+```
 
-- RASA-AUTH: 40+ test scenarios
-- RASA-SET: 40+ test scenarios
-- Bidirectional: 30+ test scenarios
-- Total: 110+ comprehensive tests
+### Quick Test (Sample fixtures only)
+
+```bash
+make check-sample
+```
+
+### Full Test Suite
+
+```bash
+make check-full
+```
+
+## Generator Scripts
+
+Located in `tests/generator/`:
+
+- **schemas/rasa_schema.py** - Type definitions
+- **combination_engine.py** - Generates flag combinations
+- **fixture_generator.py** - Produces JSON fixtures
+- **c_test_generator.py** - Generates C test code
+
+## Fixture Categories
+
+| Category | Count | Description |
+|----------|-------|-------------|
+| fallback_ | 32 | Fallback mode × flag combinations |
+| hierarchy_ | 264 | 1-5 level hierarchies |
+| asn_ | 5,208 | ASN boundaries (16/32-bit) |
+| irr_source_ | 96 | 12 IRR databases |
+| rasa_auth_ | 1,000 | Authorization scenarios |
+| combined_ | 144 | Integration tests |
+| boundary_ | 35 | Edge cases |
+| edge_ | 8 | Real-world patterns |
+
+## Why Build-Time Generation?
+
+1. **Repository Size**: 6,787 files = ~280,000 lines
+2. **Single Source**: Python scripts are the truth
+3. **CI/CD**: Fresh fixtures catch generator bugs
+4. **Deterministic**: Same scripts always produce same output
+
+The 5 sample fixtures demonstrate the format and enable quick testing.
