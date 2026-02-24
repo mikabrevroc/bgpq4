@@ -29,10 +29,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
-
-#define RASA_FALLBACK_MODE_IRR_FALLBACK 0
-#define RASA_FALLBACK_MODE_IRR_LOCK     1
-#define RASA_FALLBACK_MODE_RASA_ONLY    2
+#include "rasa.h"
 
 struct rasa_set_entry {
     char *as_set_name;

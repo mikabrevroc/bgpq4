@@ -31,16 +31,6 @@
 #include <stdint.h>
 
 static unsigned long
-hash_string(const char *str)
-{
-	unsigned long hash = 5381;
-	int c;
-	while ((c = *str++))
-	hash = ((hash << 5) + hash) + c;
-	return hash;
-}
-
-static unsigned long
 hash_asset(const char *asset)
 {
 	unsigned long hash = 5381;

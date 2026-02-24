@@ -35,6 +35,10 @@
 #include "rasa.h"
 #include "rasa_hash.h"
 
+/* Include sx_report for error/debug logging */
+#include "sx_report.h"
+extern int debug_expander;
+
 static json_t *rasa_data = NULL;
 
 int
@@ -47,6 +51,8 @@ rasa_load_config(struct rasa_config *cfg, const char *filename)
 
 	rasa_data = json_load_file(filename, 0, &error);
 	if (!rasa_data) {
+		sx_report(SX_ERROR, "RASA: Failed to parse JSON from %s: %s (line %d, column %d)\n",
+		    filename, error.text, error.line, error.column);
 		return -1;
 	}
 	cfg->enabled = 1;
@@ -98,7 +104,8 @@ rasa_check_auth(uint32_t asn, const char *asset, struct rasa_auth *result)
 			continue;
 
 		json_t *asn_obj = json_object_get(rasa_obj, "authorized_as");
-		if (!json_is_integer(asn_obj) || (uint32_t)json_integer_value(asn_obj) != asn)
+		if (!json_is_integer(asn_obj) || json_integer_value(asn_obj) < 0 ||
+		    (uint32_t)json_integer_value(asn_obj) != asn)
 			continue;
 
 		authorized_in = json_object_get(rasa_obj, "authorized_in");
@@ -174,6 +181,8 @@ rasa_set_load_config(struct rasa_set_config *cfg, const char *filename)
 
 	rasa_set_data = json_load_file(filename, 0, &error);
 	if (!rasa_set_data) {
+		sx_report(SX_ERROR, "RASA-SET: Failed to parse JSON from %s: %s (line %d, column %d)\n",
+		    filename, error.text, error.line, error.column);
 		return -1;
 	}
 
@@ -202,7 +211,10 @@ rasa_set_load_config(struct rasa_set_config *cfg, const char *filename)
 				json_t *irr_source = json_object_get(set_obj, "irr_source");
 				if (irr_source && json_is_string(irr_source)) {
 					if ((cfg->irr_source = strdup(json_string_value(irr_source))) == NULL) {
-						rasa_free_config((struct rasa_config *)cfg);
+						if (cfg->source_file) {
+						free(cfg->source_file);
+						cfg->source_file = NULL;
+					}
 						return -1;
 					}
 				}
@@ -230,7 +242,10 @@ rasa_set_load_config(struct rasa_set_config *cfg, const char *filename)
 								}
 								free(cfg->nested_sets);
 								cfg->nested_sets = NULL;
-								rasa_free_config((struct rasa_config *)cfg);
+								if (cfg->source_file) {
+						free(cfg->source_file);
+						cfg->source_file = NULL;
+					}
 								return -1;
 							}
 							}
@@ -422,8 +437,10 @@ rasa_load_sets_from_json(const char *filename)
         size_t j;
         int ret;
         
-        if (!rasa_set_obj)
+        if (!rasa_set_obj) {
+            SX_DEBUG(debug_expander, "RASA: Skipping entry %zu - missing rasa_set object\n", i);
             continue;
+        }
         
         name_obj = json_object_get(rasa_set_obj, "as_set_name");
         if (!json_is_string(name_obj))
