@@ -65,6 +65,11 @@ desktop.ini
 # Test artifacts
 tests/*.o
 tests/.deps/
+tests/scale_benchmark
+tests/scale_debug
+tests/test_rasa_lookup
+tests/test_integration
+tests/test_rasa_performance
 **/.dirstamp
 *.trs
 *.log
