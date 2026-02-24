@@ -1,0 +1,76 @@
+# Build artifacts
+*.o
+*.lo
+*.la
+*.a
+*.so
+*.dylib
+*.dll
+
+# Generated files
+.deps/
+.libs/
+Makefile
+Makefile.in
+stamp-h1
+config.h
+config.h.in
+config.log
+config.status
+configure
+configure.ac
+gtk-doc.make
+libtool
+ltmain.sh
+m4/
+
+# Build directories
+autom4te.cache/
+build/
+dist/
+
+# Binary executables
+bgpq4
+bgpq4.exe
+test_*
+!test_*.c
+!test_*.h
+
+# Debug files
+*.dSYM/
+*.pdb
+*.ilk
+
+# Backup files
+*.bak
+*.orig
+*.rej
+*~
+*.swp
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test artifacts
+tests/*.o
+tests/.deps/
+*.trs
+*.log
+test-suite.log
+
+# Core dumps
+core
+core.*
+vgcore.*
+
+# Temporary patch files
+*.patch
+diff.txt

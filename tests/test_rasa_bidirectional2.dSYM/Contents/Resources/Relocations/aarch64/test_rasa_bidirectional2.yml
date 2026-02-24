@@ -1,5 +1,0 @@
----
-triple:          'arm64-apple-darwin'
-binary-path:     test_rasa_bidirectional2
-relocations:     []
-...
