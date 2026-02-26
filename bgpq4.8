@@ -138,6 +138,15 @@ generate as-path strings of no more than len items (use 0 for infinity).
 generate config for Cisco IOS XR devices (plain IOS by default).
 .It Fl z
 generate route-filter-lists (JunOS 16.2+).
+.It Fl Y Ar file
+load RASA-SET definitions from JSON file for IRR Database Lock functionality.
+This enables verification of AS-SET membership against authorized declarations.
+Supported fallback modes: irrFallback (allow IRR if RASA empty), irrLock (IRR
+from specified source only), rasaOnly (RASA definitions exclusively).
+.It Fl y Ar file
+load RASA-AUTH authorization data from JSON file to validate that ASNs
+authorize their inclusion in specific AS-SETs. Provides bidirectional
+verification of AS-SET membership.
 .It Ar OBJECTS
 means networks (in prefix format), autonomous systems, as-sets and route-sets.
 .It Ar EXCEPT OBJECTS
@@ -348,6 +357,57 @@ Linux can be tuned in the following way:
 .Dl sysctl -w net.core.wmem_max=2097152
 .Dl sysctl -w net.ipv4.tcp_rmem="4096 87380 2097152"
 .Dl sysctl -w net.ipv4.tcp_wmem="4096 65536 2097152"
+.Sh RASA (RPKI AS-SET Authorization)
+RASA provides bidirectional verification of AS-SET membership to prevent
+unauthorized ASNs from being included in AS-SET expansions. It implements
+the member-of-as-set proposal for IRR databases.
+.Pp
+Two JSON files are used:
+.Bl -tag -width Ds
+.It RASA-SET ( Fl Y )
+Defines AS-SET membership with fallback modes:
+.Bl -tag -width irrFallback -compact
+.It irrFallback
+Use RASA members if available, otherwise query IRR
+.It irrLock
+Only query IRR from specified authoritative source
+.It rasaOnly
+Use only RASA-defined members (authoritative empty-set supported)
+.El
+.It RASA-AUTH ( Fl y )
+Defines which AS-SETs each ASN authorizes for inclusion
+.El
+.Pp
+Example RASA-SET JSON:
+.Bd -literal
+{
+  "rasa_sets": [
+    {
+      "as_set_name": "AS-HURRICANE",
+      "fallback_mode": "irrLock",
+      "irr_source": "RADB",
+      "members": [7922, 6939]
+    }
+  ]
+}
+.Ed
+.Pp
+Example RASA-AUTH JSON:
+.Bd -literal
+{
+  "rasas": [
+    {
+      "asn": 7922,
+      "authorized_in": ["AS-HURRICANE"]
+    }
+  ]
+}
+.Ed
+.Pp
+Example usage with RASA:
+.Bd -literal
+$ bgpq4 -Y rasa-sets.json -y rasa-auth.json AS-HURRICANE
+.Ed
 .Sh BUILDING
 This project uses autotools. If you are building from the repository,
 run the following command to prepare the build system:

@@ -1,7 +1,7 @@
 SUBDIRS = include
 ACLOCAL_AMFLAGS = -I m4
 
-AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include $(JANSSON_CFLAGS)
 AM_CPPFLAGS += -I$(top_srcdir)/compat
 
 AUTOMAKE_OPTIONS=foreign subdir-objects
@@ -9,18 +9,51 @@ AUTOMAKE_OPTIONS=foreign subdir-objects
 bin_PROGRAMS=bgpq4
 dist_man8_MANS=bgpq4.8
 
-bgpq4_LDADD = $(PLATFORM_LDADD) $(PROG_LDADD)
+bgpq4_LDADD = $(PLATFORM_LDADD) $(PROG_LDADD) $(JANSSON_LIBS)
 
 if !HAVE_STRLCPY
 SUBDIRS += compat
 bgpq4_LDADD += $(top_builddir)/compat/libcompat.la
 endif
 
-bgpq4_SOURCES=main.c extern.h printer.c expander.c \
+bgpq4_SOURCES=main.c extern.h printer.c expander.c rasa.c rasa.h rasa_hash.c rasa_hash.h \
     sx_prefix.c sx_prefix.h \
     sx_report.c sx_report.h \
     sx_slentry.c
 
+check_PROGRAMS = test_rasa test_rasa_integration test_rasa_minimal \
+    test_rasa_auth test_rasa_set test_rasa_bidirectional test_rasa_bidirectional2 test_rasa_edge \
+    test_rasa_realworld test_rasa_fixtures
+
+test_rasa_SOURCES = tests/test_rasa.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_LDADD = $(JANSSON_LIBS)
+
+test_rasa_integration_SOURCES = tests/test_rasa_integration.c expander.c rasa.c rasa_hash.c extern.h rasa.h rasa_hash.h sx_prefix.c sx_report.c sx_slentry.c
+test_rasa_integration_LDADD = $(JANSSON_LIBS) $(PLATFORM_LDADD)
+
+test_rasa_minimal_SOURCES = tests/test_rasa_minimal.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_minimal_LDADD = $(JANSSON_LIBS)
+
+test_rasa_auth_SOURCES = tests/test_rasa_auth.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_auth_LDADD = $(JANSSON_LIBS)
+
+test_rasa_set_SOURCES = tests/test_rasa_set.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_set_LDADD = $(JANSSON_LIBS)
+
+test_rasa_bidirectional_SOURCES = tests/test_rasa_bidirectional.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_bidirectional_LDADD = $(JANSSON_LIBS)
+
+test_rasa_bidirectional2_SOURCES = tests/test_rasa_bidirectional2.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_bidirectional2_LDADD = $(JANSSON_LIBS)
+
+test_rasa_edge_SOURCES = tests/test_rasa_edge.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_edge_LDADD = $(JANSSON_LIBS)
+
+test_rasa_realworld_SOURCES = tests/test_rasa_realworld.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_realworld_LDADD = $(JANSSON_LIBS)
+
+test_rasa_fixtures_SOURCES = tests/test_rasa_fixtures.c rasa.c rasa.h rasa_hash.c rasa_hash.h sx_report.c
+test_rasa_fixtures_LDADD = $(JANSSON_LIBS)
 
 EXTRA_DIST=bootstrap README.md CHANGES
 
@@ -33,7 +66,22 @@ MAINTAINERCLEANFILES=configure aclocal.m4 compile \
 maintainer-clean-local:
 	-rm -rf m4 autom4te.cache
 
-check:
+# Generate RASA test fixtures from Python generators
+fixtures:
+	@echo "Generating RASA test fixtures..."
+	cd tests/generator && python3 fixture_generator.py
+	@echo "Generated $(ls tests/fixtures/*.json 2>/dev/null | wc -l) fixtures"
+
+# Quick test with representative sample (no fixture generation needed)
+check-sample:
+	@echo "Running tests with sample fixtures only..."
+	./test_rasa
+	./test_rasa_auth
+	./test_rasa_set
+	./test_rasa_realworld
+	./test_rasa_edge
+
+check: check-sample
 	./bgpq4 -v
 	@echo
 	-if [ -s /etc/resolv.conf ]; then \
@@ -41,3 +89,7 @@ check:
 	else \
 		echo "No or empty /etc/resolv.conf, skipping online test"; \
 	fi
+
+check-full: fixtures check
+	@echo "Running full test suite with all fixtures..."
+	./test_rasa_fixtures

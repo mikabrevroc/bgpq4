@@ -206,6 +206,21 @@ bgpq_expander_add_as(struct bgpq_expander *b, char *as)
 	if ((asne = malloc(sizeof(struct asn_entry))) == NULL)
 		err(1, NULL);
 
+#ifdef HAVE_JANSSON
+	if (b->rasa && b->rasa->enabled) {
+		struct rasa_auth result;
+		const char *asset = b->current_asset;
+		if (rasa_check_auth(asno, asset, &result) == 0 && !result.authorized) {
+			SX_DEBUG(debug_expander, "RASA: AS%u not authorized%s%s: %s\n",
+			    asno,
+			    asset ? " in " : "",
+			    asset ? asset : "",
+			    result.reason ? result.reason : "unknown");
+			free(asne);
+			return 0;
+		}
+	}
+#endif
 	asne->asn = asno;
 	RB_INSERT(asn_tree, &b->asnlist, asne);
 
@@ -320,6 +335,55 @@ bgpq_expand_irrd(struct bgpq_expander *b,
     int (*callback)(char*, struct bgpq_expander *b, struct request *req),
     void *udata, char *fmt, ...);
 
+#ifdef HAVE_JANSSON
+#include "rasa_hash.h"
+
+static int
+process_rasa_members(struct bgpq_expander *b, struct rasa_set_entry *rasa_set)
+{
+	size_t i;
+	int count = 0;
+	
+	if (!rasa_set || !rasa_set->members)
+		return 0;
+	
+	for (i = 0; i < rasa_set->num_members; i++) {
+		uint32_t asn = rasa_set->members[i];
+		char as_str[32];
+		
+		snprintf(as_str, sizeof(as_str), "AS%u", asn);
+		
+		if (bgpq_expander_add_as(b, as_str)) {
+			SX_DEBUG(debug_expander, "RASA: Added AS%u\n", asn);
+			count++;
+		}
+	}
+	
+	return count;
+}
+
+static int
+check_rasa_set_mode(struct bgpq_expander *b, const char *asset,
+    struct rasa_set_entry **rasa_set_out)
+{
+	struct rasa_set_entry *rasa_set;
+	
+	(void)b;
+	
+	rasa_set = rasa_lookup_set(asset);
+	if (!rasa_set) {
+		if (rasa_set_out)
+			*rasa_set_out = NULL;
+		return -1;
+	}
+	
+	if (rasa_set_out)
+		*rasa_set_out = rasa_set;
+	
+	return rasa_set->fallback_mode;
+}
+#endif
+
 static int
 bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
     struct request *req)
@@ -329,6 +393,7 @@ bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
 
 	if (!strncasecmp(as, "AS-", 3) || strchr(as, '-') || strchr(as, ':')) {
 		struct sx_tentry tkey = { .text = as };
+		char *prev_asset = NULL;
 
 		if (RB_FIND(tentree, &b->already, &tkey)) {
 			SX_DEBUG(debug_expander > 2, "%s is already expanding, "
@@ -346,6 +411,80 @@ bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
 		    (b->cdepth + 1 < b->maxdepth &&
 		    req->depth + 1 < b->maxdepth)) {
 			bgpq_expander_add_already(b, as);
+#ifdef HAVE_JANSSON
+			struct rasa_set_entry *rasa_set = NULL;
+			int rasa_mode = check_rasa_set_mode(b, as, &rasa_set);
+			
+			if (rasa_mode == RASA_FALLBACK_MODE_IRR_LOCK && rasa_set) {
+				if (!rasa_set->irr_source || strlen(rasa_set->irr_source) == 0) {
+					sx_report(SX_ERROR, "RASA-SET %s has irrLock mode but no irr_source\n", as);
+					return 0;
+				}
+				
+				SX_DEBUG(debug_expander, "RASA-SET: %s locked to %s\n",
+				    as, rasa_set->irr_source);
+				source = strdup(rasa_set->irr_source);
+				
+				if (pipelining) {
+					bgpq_pipeline(b, NULL, NULL, "!s%s\n", source);
+				} else {
+					bgpq_expand_irrd(b, NULL, NULL, "!s%s\n", source);
+				}
+				free(source);
+				
+				if (pipelining) {
+					req1 = bgpq_pipeline(b, bgpq_expanded_macro_limit,
+					    NULL, "!i%s\n", bgpq_get_asset(as));
+					req1->depth = req->depth + 1;
+				} else {
+					b->cdepth++;
+					bgpq_expand_irrd(b, bgpq_expanded_macro_limit,
+					    NULL, "!i%s\n", bgpq_get_asset(as));
+					b->cdepth--;
+				}
+			}
+			else if (rasa_mode == RASA_FALLBACK_MODE_RASA_ONLY && rasa_set) {
+				if (rasa_set->num_members == 0 && rasa_set->num_nested == 0) {
+					SX_DEBUG(debug_expander, "RASA-SET: %s rasaOnly mode with empty members (authoritative empty)\n", as);
+					return 0;
+				}
+				
+				SX_DEBUG(debug_expander, "RASA-SET: %s in rasaOnly mode, using RASA data only\n", as);
+				
+				process_rasa_members(b, rasa_set);
+				
+				if (rasa_set->nested_sets) {
+					size_t i;
+					for (i = 0; i < rasa_set->num_nested; i++) {
+						char *nested = rasa_set->nested_sets[i];
+						struct sx_tentry nested_key = { .text = nested };
+						
+						if (RB_FIND(tentree, &b->already, &nested_key))
+							continue;
+						
+						SX_DEBUG(debug_expander, "RASA: Expanding nested set %s from %s\n", nested, as);
+						
+						if (pipelining) {
+							req1 = bgpq_pipeline(b, bgpq_expanded_macro_limit,
+							    NULL, "!i%s\n", bgpq_get_asset(nested));
+							req1->depth = req->depth + 1;
+						} else {
+							b->cdepth++;
+							bgpq_expand_irrd(b, bgpq_expanded_macro_limit,
+							    NULL, "!i%s\n", bgpq_get_asset(nested));
+							b->cdepth--;
+						}
+					}
+				}
+				
+				return 0;
+			}
+			else {
+				if (rasa_set) {
+					SX_DEBUG(debug_expander, "RASA-SET: %s in irrFallback mode, merging RASA and IRR\n", as);
+					process_rasa_members(b, rasa_set);
+				}
+#endif
 			if (pipelining) {
 				if (b->usesource) {
 					source = bgpq_get_source(as);
@@ -379,6 +518,12 @@ bgpq_expanded_macro_limit(char *as, struct bgpq_expander *b,
 				    NULL, "!i%s\n", bgpq_get_asset(as));
 				b->cdepth--;
 			}
+#ifdef HAVE_JANSSON
+			/* Restore previous asset context */
+			free(b->current_asset);
+			b->current_asset = prev_asset;
+			}
+#endif
 		} else {
 			SX_DEBUG(debug_expander > 2, "ignoring %s at depth %i\n",
 			    as, b->cdepth ? (b->cdepth + 1) : (req->depth + 1));
@@ -1209,6 +1354,10 @@ bgpq_expand(struct bgpq_expander *b)
 		fcntl(fd, F_SETFL, O_NONBLOCK|(fcntl(fd, F_GETFL)));
 
 	STAILQ_FOREACH(mc, &b->macroses, entry) {
+#ifdef HAVE_JANSSON
+		/* Set current asset context for top-level AS-SET expansion */
+		b->current_asset = strdup(mc->text);
+#endif
 		if (!b->maxdepth && RB_EMPTY(&b->stoplist)) {
 			if (b->usesource) {
 				source = bgpq_get_source(mc->text);
@@ -1253,6 +1402,11 @@ bgpq_expand(struct bgpq_expander *b)
 				bgpq_expand_irrd(b, bgpq_expanded_macro_limit,
 				    NULL, "!i%s\n", bgpq_get_asset(mc->text));
 		}
+#ifdef HAVE_JANSSON
+		/* Clear current asset context after expansion */
+		free(b->current_asset);
+		b->current_asset = NULL;
+#endif
 	}
 
 	if (pipelining){
@@ -1457,6 +1611,23 @@ expander_freeall(struct bgpq_expander *expander)
 	}
 
 	sx_radix_tree_freeall(expander->tree);
+
+#ifdef HAVE_JANSSON
+	if (expander->rasa) {
+		rasa_free_config(expander->rasa);
+		free(expander->rasa);
+		expander->rasa = NULL;
+	}
+	if (expander->rasa_set) {
+		rasa_set_free_config(expander->rasa_set);
+		free(expander->rasa_set);
+		expander->rasa_set = NULL;
+	}
+	if (expander->current_asset) {
+		free(expander->current_asset);
+		expander->current_asset = NULL;
+	}
+#endif
 
 	bgpq_prequest_freeall(expander->firstpipe);
 	bgpq_prequest_freeall(expander->lastpipe);

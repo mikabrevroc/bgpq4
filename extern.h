@@ -29,6 +29,10 @@
 
 #include "sx_prefix.h"
 
+#ifdef HAVE_JANSSON
+#include "rasa.h"
+#endif
+
 struct slentry {
 	STAILQ_ENTRY(slentry)	 entry;
 	char			*text;
@@ -117,6 +121,11 @@ struct bgpq_expander {
 	STAILQ_HEAD(requests, request)	 wq, rq;
 	STAILQ_HEAD(slentries, slentry)	 macroses, rsets;
 	RB_HEAD(tentree, sx_tentry)	 already, stoplist;
+#ifdef HAVE_JANSSON
+	struct rasa_config	*rasa;
+	struct rasa_set_config	*rasa_set;
+	char			*current_asset;
+#endif
 };
 
 int asn_cmp(struct asn_entry *, struct asn_entry *);

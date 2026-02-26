@@ -35,6 +35,11 @@
 
 #include "sx_report.h"
 
+/* Define debug_expander for test builds (main build defines it in expander.c) */
+#ifndef TESTING
+int debug_expander = 0;
+#endif
+
 static int reportStderr=1;
 
 static char const* 

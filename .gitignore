@@ -1,0 +1,90 @@
+# Build artifacts
+*.o
+*.lo
+*.la
+*.a
+*.so
+*.dylib
+*.dll
+
+# Generated files
+.deps/
+.libs/
+**/Makefile
+!**/Makefile.am
+**/Makefile.in
+stamp-h1
+config.h
+config.h.in
+config.log
+config.guess
+config.sub
+config.status
+configure
+configure.ac
+gtk-doc.make
+libtool
+ltmain.sh
+m4/
+
+# Build directories
+autom4te.cache/
+build/
+dist/
+
+# Binary executables
+bgpq4
+bgpq4.exe
+test_*
+!test_*.c
+!test_*.h
+
+# Debug files
+*.dSYM/
+*.pdb
+*.ilk
+
+# Backup files
+*.bak
+*.orig
+*.rej
+*~
+*.swp
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.code-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test artifacts
+tests/*.o
+tests/.deps/
+tests/scale_benchmark
+tests/scale_debug
+tests/test_rasa_lookup
+tests/test_integration
+tests/test_rasa_performance
+**/.dirstamp
+*.trs
+*.log
+test-suite.log
+
+# Generated test fixtures (created at build time by tests/generator/fixture_generator.py)
+tests/fixtures/*.json
+!tests/fixtures/sample/*.json
+!tests/fixtures/README.md
+
+# Core dumps
+core
+core.*
+vgcore.*
+
+# Temporary patch files
+*.patch
+diff.txt
